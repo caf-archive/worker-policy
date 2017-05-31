@@ -1,0 +1,15 @@
+{
+  "description": "Returns a SHA-1 digest of the input file.",
+  "properties": {
+    "queueName": {
+      "description": "Optional. A BinaryHash Policy Handler exists to execute Policies of type 'BinaryHash Policy Type'.  Typically the target queue name is provided via BinaryHash Policy Handler configuration.  If there is a need to establish multiple instances of a BinaryHash Policy to target different queues, then queueName should be specified as part of the BinaryHash Policy Definition, otherwise exclude this attribute.  An example usage of this feature could be to route larger files to a different queue.",
+      "type": "string"
+    },
+    "diagnosticsQueueName": {
+      "description": "Optional. An example usage of this feature could be to route failed files to a different BinaryHash queue for diagnostics.",
+      "type": "string"
+    }
+  },
+  "title": "BinaryHash policy Type",
+  "type": "object"
+}

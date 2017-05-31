@@ -1,0 +1,105 @@
+{
+  "description": "Segments and marks up email message content.",
+  "properties": {
+    "queueName": {
+      "description": "Optional. A Markup Policy Handler exists to execute Policies of type 'Markup Policy Type'.  Typically the target queue name is provided via Markup Policy Handler configuration.  If there is a need to establish multiple instances of a Markup Policy to target different queues, then queueName should be specified as part of the Markup Policy Definition, otherwise exclude this attribute.  An example usage of this feature could be to route larger files to a different queue.",
+      "type": "string"
+    },
+    "diagnosticsQueueName": {
+      "description": "Optional. An example usage of this feature could be to route failed files to a different Markup queue for diagnostics.",
+      "type": "string"
+    },
+    "fields": {
+      "description": "Optional. Fields that will be evaluated during markup. Matching for multiple fields can be achieved with '*' wildcard.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "hashConfiguration": {
+      "description": "Optional. Specifies the configuration for which fields to be included in the hash, the type of normalization to be performed per field and the hash function to be carried out on the list of fields.",
+      "$ref": "#/definitions/hashConfigurationDefinition"
+    },
+    "outputFields": {
+      "description": "Optional. Specifies the list of output fields to be returned from the XML document as specified.",
+      "$ref": "#/definitions/outputFieldsDefinition"
+    },
+    "isEmail": {
+      "description": "Optional. Specifies if the message being passed is an email.",
+      "type": "boolean"
+    }
+  },
+  "title": "Markup policy Type",
+  "type": "object",
+  "definitions": {
+    "hashConfigurationDefinition": {
+      "description":"Optional: The hash configuration specifies the configuration for which fields to be included in the hash, the type of normalization to be performed per field and the hash function to be carried out on the list of fields.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "Name of the hash to be included.",
+            "type": "string"
+          },
+          "scope": {
+            "description":"Where the hash should be preformed.",
+            "enum": [
+              "EMAIL_SPECIFIC",
+              "EMAIL_THREAD"
+            ]
+          },
+          "fields":{
+            "description":"List of fields to be included in the hash.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "description": "Name of the field / element tag in xml. Matching for multiple fields can be achieved with '*' wildcard.",
+                  "type": "string"
+                },
+                "normalizationType": {
+                  "description":"Type of field data normalization.",
+                  "enum": [
+                    "NONE",
+                    "REMOVE_WHITESPACE",
+                    "NAME_ONLY",
+                    "REMOVE_WHITESPACE_AND_LINKS"
+                  ]
+                }
+              }
+            }
+          },
+          "hashFunctions":{
+            "description":"A list of hash functions to use.",
+            "type": "array",
+            "items": {
+              "enum": [
+                "NONE",
+                "XXHASH64"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "outputFieldsDefinition": {
+      "description":"Optional: The list of the output fields to be returned from the XML document.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "field": {
+            "description": "Name of document field to be returned",
+            "type": "string"
+          },
+          "xPathExpression": {
+            "description": "XPath expression needed to extract the field value from the XML document.",
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

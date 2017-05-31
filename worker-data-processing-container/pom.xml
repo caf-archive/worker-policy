@@ -1,0 +1,805 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright 2015-2017 Hewlett Packard Enterprise Development LP.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.github.cafdataprocessing</groupId>
+        <artifactId>worker-policy-aggregator</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>worker-data-processing-container</artifactId>
+    <packaging>pom</packaging>
+
+    <properties>
+        <container.classification.worker.name>cafinternal/prereleases:worker-classification-${project.version}</container.classification.worker.name>
+        <container.worker.alias>worker-data-processing</container.worker.alias>
+        <container.worker.name>cafinternal/prereleases:worker-data-processing-${project.version}</container.worker.name>
+
+        <container.test-configs.dir>/config</container.test-configs.dir>
+
+        <engine.environmentcache.location>/var/corepolicy/envcache</engine.environmentcache.location>
+
+        <fileSet.outputDirectory>Copied</fileSet.outputDirectory>
+
+        <!-- This config is used from the testing machine, as such we need the docker host address and dynamically exported port, of course you can make
+        both this config, and the config int he container point to your own DB, but this is the default setup, which create a new linked container from scratch for
+        each test run -->
+        <hibernate.connectionstring>jdbc:postgresql://${docker.host.address}:${postgres.db.port}/&lt;dbname&gt;</hibernate.connectionstring>
+
+        <!-- The reason behind having 2 here connection strings, is that we also connect to the DB from inside the worker containers.  It doesn't use
+        dnslookup, as its on a private network, it instead uses a fixed name called callingSystem, which you can map to anything you want. It is then added
+        to the containers host file. -->
+        <internal.hibernate.connectionstring>jdbc:postgresql://corepolicydb-postgres:5432/&lt;dbname&gt;</internal.hibernate.connectionstring>
+
+        <hibernate.user>postgres</hibernate.user>
+        <hibernate.password>root</hibernate.password>
+        <hibernate.databasename>workflow</hibernate.databasename>
+        <rabbit.user>user</rabbit.user>
+        <rabbit.pass>pass</rabbit.pass>
+        <worker.queue.input>worker-input</worker.queue.input>
+        <worker.queue.output>worker-output</worker.queue.output>
+    </properties>
+
+    <dependencies>
+        <!-- We have log4j as a test dependency but as worker-core uses logback by default from its dropwizard dependency
+        we need to manually add this higher in the dependency set to get it picked up as the default implementation to be used with our
+        integration tests -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>2.0-rc2</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>log4j-api</artifactId>
+                    <groupId>org.apache.logging.log4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.cafapi</groupId>
+            <artifactId>container-cert-script</artifactId>
+            <type>tar.gz</type>
+        </dependency>
+        <!-- database installer for use in testing container, not to be included in the worker container -->
+        <dependency>
+            <groupId>com.github.cafdataprocessing</groupId>
+            <artifactId>corepolicy-database</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.cafdataprocessing</groupId>
+            <artifactId>worker-policy</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.cafdataprocessing</groupId>
+            <artifactId>worker-policy-binary-hash-worker-handler</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.cafdataprocessing</groupId>
+            <artifactId>worker-policy-boilerplate-worker-handler</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.cafdataprocessing</groupId>
+            <artifactId>worker-policy-elasticsearch-classification-worker-handler</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.cafdataprocessing</groupId>
+            <artifactId>worker-policy-document-worker-handler</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.cafdataprocessing</groupId>
+            <artifactId>worker-policy-field-mapping-handler</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.cafdataprocessing</groupId>
+            <artifactId>worker-policy-generic-queue-handler</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.cafdataprocessing</groupId>
+            <artifactId>worker-policy-markup-worker-handler</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.cafdataprocessing</groupId>
+            <artifactId>worker-policy-stop-handler</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.cafdataprocessing</groupId>
+            <artifactId>worker-policy-binary-hash-worker-converter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.cafdataprocessing</groupId>
+            <artifactId>worker-policy-boilerplate-worker-converter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.cafdataprocessing</groupId>
+            <artifactId>worker-policy-classification-worker-converter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.cafdataprocessing</groupId>
+            <artifactId>worker-policy-document-worker-converter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.cafdataprocessing</groupId>
+            <artifactId>worker-policy-markup-worker-converter</artifactId>
+        </dependency>
+
+        <!-- shared testing project now gives us all the required testing dependencies for free i.e. mockito / junit etc. -->
+        <dependency>
+            <groupId>com.github.cafdataprocessing</groupId>
+            <artifactId>worker-policy-testing</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.cafdataprocessing</groupId>
+            <artifactId>worker-policy-handlers-converters-testing</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.krallin</groupId>
+            <artifactId>tini</artifactId>
+            <scope>runtime</scope>
+            <type>exe</type>
+        </dependency>
+        <dependency>
+            <groupId>com.github.workerframework</groupId>
+            <artifactId>standard-worker-container</artifactId>
+            <type>pom</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.github.workerframework</groupId>
+                    <artifactId>worker-store-cs</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.github.workerframework</groupId>
+            <artifactId>worker-store-fs</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.ws.rs</groupId>
+                    <artifactId>jsr311-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <!-- profile to optionally disable build of a container, you can enable this profile, and run your tests against
+        a fixed container without rebuilding each time. -->
+        <profile>
+            <id>skip-build-docker-container</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <version>${fabric8.docker.maven.version}</version>
+                        <executions>
+                            <execution>
+                                <id>build-docker-container</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>true</skip>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>skip-start-docker-container</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <version>${fabric8.docker.maven.version}</version>
+                        <executions>
+                            <execution>
+                                <id>start</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>start</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>true</skip>
+                                </configuration>
+                            </execution>
+                            <!-- Stop the containers in post-integration-test phase. -->
+                            <execution>
+                                <id>stop</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>stop</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>true</skip>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>use-default-fixed-ports</id>
+            <properties>
+                <classification-worker-8080-serviceport>9060</classification-worker-8080-serviceport>
+                <classification-worker-8081-serviceport>9062</classification-worker-8081-serviceport>
+                <classification.container.debug.port>5007</classification.container.debug.port>
+                <data-processing.container.debug.port>5005</data-processing.container.debug.port>
+                <data-processing-worker-8080-serviceport>9002</data-processing-worker-8080-serviceport>
+                <data-processing-worker-8081-serviceport>9050</data-processing-worker-8081-serviceport>
+                <postgres.db.port>5432</postgres.db.port>
+                <rabbitmq.ctrl.port>15672</rabbitmq.ctrl.port>
+                <rabbitmq.node.port>5672</rabbitmq.node.port>
+                <docker.host.address>192.168.56.10</docker.host.address>
+                <webdav.apache.port>32837</webdav.apache.port>
+            </properties>
+        </profile>
+    </profiles>
+
+    <build>
+        <plugins>
+            <!-- Unpack the base worker configuration files -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>process-config-files</id>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>com.github.workerframework</groupId>
+                                    <artifactId>worker-default-configs</artifactId>
+                                    <outputDirectory>${project.build.directory}/config-files</outputDirectory>
+                                    <excludes>**/META-INF/**</excludes>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Process the local configuration files -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.0.2</version>
+                <executions>
+                    <execution>
+                        <id>process-config-files</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/config-files</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/config</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${maven.failsafe.version}</version>
+                <configuration>
+                    <!--<debugForkedProcess>true</debugForkedProcess>-->
+                    <dependenciesToScan>
+                        <dependency>com.github.cafdataprocessing:worker-policy-testing</dependency>
+                        <dependency>com.github.cafdataprocessing:worker-policy-handlers-converters-testing</dependency>
+                    </dependenciesToScan>
+                    <environmentVariables>
+                        <CAF_INTEGRATIONTESTS_FS_PATH>${caf.integrationtests.fs.path}</CAF_INTEGRATIONTESTS_FS_PATH>
+                    </environmentVariables>
+                    <reportsDirectory>${project.build.directory}\failsafe-reports</reportsDirectory>
+                    <skip>false</skip>
+                    <summaryFile>${project.build.directory}\failsafe-reports\summary.xml</summaryFile>
+                    <systemPropertyVariables>
+                        <api.mode>direct</api.mode>
+                        <api.direct.repository>hibernate</api.direct.repository>
+                        <docker.host.address>${docker.host.address}</docker.host.address>
+                        <hibernate.connectionstring>${hibernate.connectionstring}</hibernate.connectionstring>
+                        <hibernate.databasename>${hibernate.databasename}</hibernate.databasename>
+                        <hibernate.password>${hibernate.password}</hibernate.password>
+                        <hibernate.user>${hibernate.user}</hibernate.user>
+                        <rabbit.host>${docker.host.address}</rabbit.host>
+                        <rabbit.inputqueue>${worker.queue.input}</rabbit.inputqueue>
+                        <rabbit.resultqueue>${worker.queue.output}</rabbit.resultqueue>
+                        <rabbit.pass>${rabbit.pass}</rabbit.pass>
+                        <rabbit.port>${rabbitmq.node.port}</rabbit.port>
+                        <rabbit.user>${rabbit.user}</rabbit.user>
+                        <store-fs-enabled>true</store-fs-enabled>
+                        <worker.healthcheck.address>http://${docker.host.address}:${data-processing-worker-8081-serviceport}/healthcheck</worker.healthcheck.address>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>${fabric8.docker.maven.version}</version>
+                <executions>
+                    <!-- Build the container in compile phase. -->
+                    <execution>
+                        <id>build-docker-container</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                    <!-- Start the containers in pre-integration-test phase. -->
+                    <execution>
+                        <id>start</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>start</goal>
+                        </goals>
+                    </execution>
+                    <!-- Stop the containers in post-integration-test phase. -->
+                    <execution>
+                        <id>stop</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                    </execution>
+                    <!-- Push the docker image for the worker to Artifactory in deploy phase -->
+                    <execution>
+                        <id>upload-docker-container</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>push</goal>
+                        </goals>
+                        <configuration>
+                            <filter>${container.worker.alias}</filter>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <verbose>true</verbose>
+                    <logDate>default</logDate>
+                    <autoPull>always</autoPull>
+                    <useColor>true</useColor>
+                    <images>
+                        <image>
+                            <alias>test-configs</alias>
+                            <name>worker/data-processing/test/configs</name>
+                            <build>
+                                <tags>
+                                    <tag>built-as-part-of-${project.parent.artifactId}-latest</tag>
+                                    <tag>temporary-item-please-remove</tag>
+                                </tags>
+                                <assembly>
+                                    <basedir>${container.test-configs.dir}</basedir>
+                                    <inline>
+                                        <fileSets>
+                                            <fileSet>
+                                                <directory>${project.basedir}/test-configs</directory>
+                                                <outputDirectory>.</outputDirectory>
+                                                <includes>
+                                                    <include>*</include>
+                                                </includes>
+                                            </fileSet>
+                                        </fileSets>
+                                    </inline>
+                                </assembly>
+                            </build>
+                        </image>
+                        <image>
+                            <alias>webdav</alias>
+                            <name>cloudesire/webdav</name>
+                            <run>
+                                <volumes>
+                                    <bind>
+                                        <volume>/srv/common/webdav</volume>
+                                    </bind>
+                                </volumes>
+                                <ports>
+                                    <port>${webdav.apache.port}:8080</port>
+                                </ports>
+                                <env>
+                                    <APACHE_PORT>8080</APACHE_PORT>
+                                </env>
+                                <wait>
+                                    <log>WebDAV Server startup complete</log>
+                                    <http>
+                                        <url>http://${docker.host.address}:${webdav.apache.port}</url>
+                                    </http>
+                                    <time>120000</time>
+                                    <shutdown>500</shutdown>
+                                </wait>
+                                <log>
+                                    <enabled>true</enabled>
+                                </log>
+                            </run>
+                        </image>
+
+                        <image>
+                            <alias>rabbitmq</alias>
+                            <name>rabbitmq:3-management</name>
+                            <run>
+                                <ports>
+                                    <port>${rabbitmq.ctrl.port}:15672</port>
+                                    <port>${rabbitmq.node.port}:5672</port>
+                                </ports>
+                                <env>
+                                    <RABBITMQ_DEFAULT_PASS>pass</RABBITMQ_DEFAULT_PASS>
+                                    <RABBITMQ_DEFAULT_USER>user</RABBITMQ_DEFAULT_USER>
+                                    <RABBITMQ_ERLANG_COOKIE>chocolatechip</RABBITMQ_ERLANG_COOKIE>
+                                </env>
+                                <wait>
+                                    <log>Server startup complete</log>
+                                    <http>
+                                        <url>http://${docker.host.address}:${rabbitmq.ctrl.port}</url>
+                                    </http>
+                                    <time>120000</time>
+                                    <shutdown>500</shutdown>
+                                </wait>
+                                <log>
+                                    <enabled>true</enabled>
+                                </log>
+                            </run>
+                        </image>
+
+                        <image>
+                            <alias>corepolicydb-postgres</alias>
+                            <name>postgres:9.4</name>
+                            <run>
+                                <ports>
+                                    <port>${postgres.db.port}:5432</port>
+                                </ports>
+                                <env>
+                                    <POSTGRES_PASSWORD>${hibernate.password}</POSTGRES_PASSWORD>
+                                    <POSTGRES_USER>${hibernate.user}</POSTGRES_USER>
+                                    <POSTGRES_DB>${hibernate.databasename}</POSTGRES_DB>
+                                </env>
+                                <wait>
+                                    <log>PostgreSQL init process complete</log>
+                                    <time>20000</time>
+                                    <shutdown>500</shutdown>
+                                </wait>
+                                <log>
+                                    <enabled>true</enabled>
+                                </log>
+                            </run>
+                        </image>
+
+                        <image>
+                            <alias>corepolicy-dbinstaller</alias>
+                            <name>policy/dbinstaller</name>
+                            <build>
+                                <from>java:8</from>
+                                <tags>
+                                    <tag>built-as-part-of-${project.parent.artifactId}-latest</tag>
+                                    <tag>temporary-item-please-remove</tag>
+                                </tags>
+                                <assembly>
+                                    <basedir>/</basedir>
+                                    <inline>
+                                        <dependencySets>
+                                            <dependencySet>
+                                                <fileMode>0755</fileMode>
+                                                <useProjectArtifact>true</useProjectArtifact>
+                                                <includes>
+                                                    <include>com.github.cafdataprocessing:corepolicy-database</include>
+                                                </includes>
+                                                <outputFileNameMapping>corepolicy-database.jar</outputFileNameMapping>
+                                            </dependencySet>
+                                        </dependencySets>
+                                    </inline>
+                                </assembly>
+                            </build>
+                            <run>
+                                <links>
+                                    <link>corepolicydb-postgres</link>
+                                </links>
+                                <log>
+                                    <enabled>true</enabled>
+                                </log>
+                                <cmd>java
+                                    -Dapi.mode=direct
+                                    -Dapi.direct.repository=hibernate
+                                    -Dhibernate.connectionstring=${internal.hibernate.connectionstring}
+                                    -Dhibernate.user=${hibernate.user}
+                                    -Dhibernate.password=${hibernate.password}
+                                    -Dhibernate.databasename=${hibernate.databasename}
+                                    -jar /corepolicy-database.jar -c
+                                </cmd>
+                                <wait>
+                                    <log>DB update finished.</log>
+                                    <time>120000</time>
+                                    <shutdown>500</shutdown>
+                                </wait>
+                            </run>
+                        </image>
+
+                        <image>
+                            <!-- Specified per profile - not in common configuration-->
+                            <alias>${container.worker.alias}</alias>
+                            <name>${container.worker.name}</name>
+                            <build>
+                                <from>${caf.base-container.policy-elasticsearch}</from>
+                                <labels>
+                                    <Build.Number>${project.version}</Build.Number>
+                                    <Build.Date>${maven.build.timestamp}</Build.Date>
+                                    <Git.Branch>${git.branch}</Git.Branch>
+                                    <Git.Commit>${git.revision}</Git.Commit>
+                                </labels>
+                                <!-- Expose ports required by Worker dropwizard functionality. Metrics for Worker accessible on port 8081 -->
+                                <ports>
+                                    <port>8080</port>
+                                    <port>8081</port>
+                                </ports>
+                                <volumes>
+                                    <volume>${engine.environmentcache.location}</volume>
+                                </volumes>
+                                <!-- Run application through tini -->
+                                <entryPoint>
+                                    <exec>
+                                        <args>/opt/tini-${tini.version}.exe</args>
+                                        <args>--</args>
+                                    </exec>
+                                </entryPoint>
+                                <env>
+                                    <POLICY_ELASTICSEARCH_DISABLED>true</POLICY_ELASTICSEARCH_DISABLED>
+                                </env>
+                                <cmd>/opt/${fileSet.outputDirectory}/start.sh</cmd>
+                                <assembly>
+                                    <basedir>/opt</basedir>
+                                    <mode>tar</mode>
+                                    <descriptor>policyWorkerAssembly.xml</descriptor>
+                                </assembly>
+                            </build>
+                            <run>
+                                <ports>
+                                    <port>${data-processing-worker-8080-serviceport}:8080</port>
+                                    <port>${data-processing-worker-8081-serviceport}:8081</port>
+                                    <port>${data-processing.container.debug.port}:5005</port>
+                                </ports>
+                                <env>
+                                    <CAF_RABBITMQ_HOST>rabbitmq</CAF_RABBITMQ_HOST>
+                                    <CAF_RABBITMQ_PASSWORD>${rabbit.pass}</CAF_RABBITMQ_PASSWORD>
+                                    <CAF_RABBITMQ_USERNAME>${rabbit.user}</CAF_RABBITMQ_USERNAME>
+                                    <CAF_DATA_PROCESSING_WORKER_REGISTER_HANDLERS>true</CAF_DATA_PROCESSING_WORKER_REGISTER_HANDLERS>
+                                    <CAF_WORKER_DATASTORE_PATH>/srv/common/webdav</CAF_WORKER_DATASTORE_PATH>
+                                    <CAF_WORKER_JAVA_OPTS>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005</CAF_WORKER_JAVA_OPTS>
+                                    <CAF_WORKER_INPUT_QUEUE>${worker.queue.input}</CAF_WORKER_INPUT_QUEUE>
+                                    <CAF_WORKER_OUTPUT_QUEUE>${worker.queue.output}</CAF_WORKER_OUTPUT_QUEUE>
+                                    <POLICY_LOGGING_FILE>${container.test-configs.dir}/policy.yaml</POLICY_LOGGING_FILE>
+                                    <api.mode>direct</api.mode>
+                                    <api.admin.basedata>true</api.admin.basedata>
+                                    <api.direct.repository>hibernate</api.direct.repository>
+                                    <binaryhashworkerhandler.taskqueue>binary-hash-in</binaryhashworkerhandler.taskqueue>
+                                    <elasticsearchclassificationworkerhandler.taskqueue>classification-in</elasticsearchclassificationworkerhandler.taskqueue>
+                                    <engine.environmentcache.location>${engine.environmentcache.location}</engine.environmentcache.location>
+                                    <hibernate.connectionstring>${internal.hibernate.connectionstring}</hibernate.connectionstring>
+                                    <hibernate.user>${hibernate.user}</hibernate.user>
+                                    <hibernate.password>${hibernate.password}</hibernate.password>
+                                    <hibernate.databasename>${hibernate.databasename}</hibernate.databasename>
+                                    <worker-languagedetection.taskqueue>worker-languagedetection-in</worker-languagedetection.taskqueue>
+                                </env>
+                                <wait>
+                                    <http>
+                                        <url>http://${docker.host.address}:${data-processing-worker-8081-serviceport}</url>
+                                        <method>GET</method>
+                                    </http>
+                                    <time>90000</time>
+                                    <shutdown>500</shutdown>
+                                </wait>
+                                <volumes>
+                                    <from>
+                                        <image>test-configs</image>
+                                        <image>webdav</image>
+                                    </from>
+                                </volumes>
+                                <links>
+                                    <link>rabbitmq</link>
+                                    <link>corepolicydb-postgres</link>
+                                </links>
+                                <log>
+                                    <!-- enable logs from the container, they will show with policyadmin> prefix
+                                    and in the colour yellow -->
+                                    <color>yellow</color>
+                                    <enabled>true</enabled>
+                                </log>
+                            </run>
+                        </image>
+
+                        <!-- Images used by integration tests -->
+
+                        <!-- Classification worker for the classification handler tests -->
+                        <image>
+                            <alias>classification-worker</alias>
+                            <name>${container.classification.worker.name}</name>
+                            <run>
+                                <env>
+                                    <CAF_RABBITMQ_HOST>rabbitmq</CAF_RABBITMQ_HOST>
+                                    <CAF_RABBITMQ_PASSWORD>${rabbit.pass}</CAF_RABBITMQ_PASSWORD>
+                                    <CAF_RABBITMQ_USERNAME>${rabbit.user}</CAF_RABBITMQ_USERNAME>
+                                    <CAF_WORKER_DATASTORE_PATH>/srv/common/webdav</CAF_WORKER_DATASTORE_PATH>
+                                    <!--<CAF_WORKER_JAVA_OPTS>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005</CAF_WORKER_JAVA_OPTS>-->
+                                    <CAF_WORKER_INPUT_QUEUE>classification-in</CAF_WORKER_INPUT_QUEUE>
+                                    <CAF_WORKER_OUTPUT_QUEUE>${worker.queue.input}</CAF_WORKER_OUTPUT_QUEUE>
+                                    <api.mode>direct</api.mode>
+                                    <api.admin.basedata>true</api.admin.basedata>
+                                    <api.direct.repository>hibernate</api.direct.repository>
+                                    <hibernate.connectionstring>${internal.hibernate.connectionstring}</hibernate.connectionstring>
+                                    <hibernate.user>${hibernate.user}</hibernate.user>
+                                    <hibernate.password>${hibernate.password}</hibernate.password>
+                                    <hibernate.databasename>${hibernate.databasename}</hibernate.databasename>
+                                </env>
+                                <ports>
+                                    <port>${classification-worker-8080-serviceport}:8080</port>
+                                    <port>${classification-worker-8081-serviceport}:8081</port>
+                                    <port>${classification.container.debug.port}:5005</port>
+                                </ports>
+                                <wait>
+                                    <http>
+                                        <!-- note this check uses external port exposed on docker VM, it may be in bridged mode, or running
+                                        in its own machine, in which case, this can be the same as the container.run.tomcat.service.port -->
+                                        <url>http://${docker.host.address}:${classification-worker-8081-serviceport}</url>
+                                        <method>GET</method>
+                                    </http>
+                                    <time>90000</time>
+                                    <shutdown>500</shutdown>
+                                </wait>
+                                <volumes>
+                                    <from>
+                                        <image>webdav</image>
+                                    </from>
+                                </volumes>
+                                <links>
+                                    <link>rabbitmq</link>
+                                    <link>corepolicydb-postgres</link>
+                                </links>
+                                <log>
+                                    <!-- enable logs from the container, they will show with policyadmin> prefix
+                                    and in the colour yellow -->
+                                    <color>yellow</color>
+                                    <enabled>true</enabled>
+                                </log>
+                            </run>
+                        </image>
+
+                        <!-- Start BinaryHash Worker Image -->
+                        <image>
+                            <alias>binaryhash-worker</alias>
+                            <name>${caf.worker.binaryhash.container.name}</name>
+                            <run>
+                                <ports>
+                                    <port>${binaryhash.adminport}:8081</port>
+                                </ports>
+                                <env>
+                                    <CAF_RABBITMQ_HOST>rabbitmq</CAF_RABBITMQ_HOST>
+                                    <CAF_RABBITMQ_PASSWORD>${rabbit.pass}</CAF_RABBITMQ_PASSWORD>
+                                    <CAF_RABBITMQ_USERNAME>${rabbit.user}</CAF_RABBITMQ_USERNAME>
+                                    <CAF_WORKER_DATASTORE_PATH>/srv/common/webdav</CAF_WORKER_DATASTORE_PATH>
+                                    <CAF_WORKER_INPUT_QUEUE>binary-hash-in</CAF_WORKER_INPUT_QUEUE>
+                                    <CAF_WORKER_OUTPUT_QUEUE>${worker.queue.input}</CAF_WORKER_OUTPUT_QUEUE>
+                                </env>
+                                <volumes>
+                                    <from>
+                                        <image>webdav</image>
+                                    </from>
+                                </volumes>
+                                <links>
+                                    <link>rabbitmq</link>
+                                </links>
+                                <log>
+                                    <enabled>true</enabled>
+                                </log>
+                                <wait>
+                                    <http>
+                                        <url>http://${docker.host.address}:${binaryhash.adminport}</url>
+                                    </http>
+                                    <time>120000</time>
+                                    <shutdown>500</shutdown>
+                                </wait>
+                            </run>
+                        </image>
+
+                        <!-- Start Lang Detect Worker Image -->
+                        <image>
+                            <alias>lang-detect-worker</alias>
+                            <name>${caf.worker.langdetect.container.name}</name>
+                            <run>
+                                <ports>
+                                    <port>${langdetect.adminport}:8081</port>
+                                </ports>
+                                <env>
+                                    <CAF_RABBITMQ_HOST>rabbitmq</CAF_RABBITMQ_HOST>
+                                    <CAF_RABBITMQ_PASSWORD>${rabbit.pass}</CAF_RABBITMQ_PASSWORD>
+                                    <CAF_RABBITMQ_USERNAME>${rabbit.user}</CAF_RABBITMQ_USERNAME>
+                                    <CAF_WORKER_DATASTORE_PATH>/srv/common/webdav</CAF_WORKER_DATASTORE_PATH>
+                                    <CAF_WORKER_INPUT_QUEUE>worker-languagedetection-in</CAF_WORKER_INPUT_QUEUE>
+                                    <CAF_WORKER_OUTPUT_QUEUE>${worker.queue.input}</CAF_WORKER_OUTPUT_QUEUE>
+                                </env>
+                                <volumes>
+                                    <from>
+                                        <image>webdav</image>
+                                    </from>
+                                </volumes>
+                                <links>
+                                    <link>rabbitmq</link>
+                                </links>
+                                <log>
+                                    <enabled>true</enabled>
+                                </log>
+                                <wait>
+                                    <http>
+                                        <url>http://${docker.host.address}:${langdetect.adminport}</url>
+                                    </http>
+                                    <time>120000</time>
+                                    <shutdown>500</shutdown>
+                                </wait>
+                            </run>
+                        </image>
+                    </images>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <reportSets>
+                    <reportSet>
+                        <id>failsafe-reporting-worker-classification-container</id>
+                        <configuration>
+                            <outputName>failsafe-worker-classification-container</outputName>
+                            <reportsDirectories>
+                                <file>${project.build.directory}/failsafe-reports</file>
+                            </reportsDirectories>
+                        </configuration>
+                        <reports>
+                            <report>failsafe-report-only</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+        </plugins>
+    </reporting>
+</project>

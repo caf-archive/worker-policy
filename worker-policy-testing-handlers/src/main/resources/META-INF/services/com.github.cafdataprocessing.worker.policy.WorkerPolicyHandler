@@ -1,0 +1,3 @@
+com.github.cafdataprocessing.worker.policy.testing.handlers.IndexWorkerHandler
+com.github.cafdataprocessing.worker.policy.testing.handlers.CheckTempFieldsWorkerHandler
+com.github.cafdataprocessing.worker.policy.testing.handlers.DataReprocessingTestHandler

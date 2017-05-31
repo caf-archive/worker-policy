@@ -1,0 +1,22 @@
+{
+  "description": "Properties for the generic queue policy.",
+  "properties": {
+    "queueName": {
+      "description": "The queue to send the document to.",
+      "type": "string"
+    },
+    "apiVersion": {
+      "default": 1,
+      "description": "Optional. The version of the worker the document will be sent to.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "messageType": {
+      "default": "Worker",
+      "description": "Optional. The name of the worker the document will be sent to.",
+      "type": "string"
+    }
+  },
+  "title": "Generic queue policy Type",
+  "type": "object"
+}

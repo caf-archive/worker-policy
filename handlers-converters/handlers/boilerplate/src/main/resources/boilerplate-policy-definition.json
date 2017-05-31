@@ -1,0 +1,126 @@
+{
+  "description": "Detects and optionally removes or replaces boilerplate text on a document.",
+  "definitions": {
+    "redactionType": {
+      "enum": [
+        "DO_NOTHING",
+        "REMOVE",
+        "REPLACE"
+      ],
+      "default": "DO_NOTHING"
+    }
+  },
+  "properties": {
+    "queueName": {
+      "description": "Optional. A Boilerplate Handler exists to execute Policies of type 'Boilerplate Policy Type'. Typically the target queue name is provided via Boilerplate Policy Handler configuration. If there is a need to establish multiple instances of a Boilerplate Policy to target different queues, then queueName should be specified as part of the Policy. An example usage of this feature could be to route larger files to a different queue.",
+      "type": "string"
+    },
+    "diagnosticsQueueName": {
+      "description": "Optional. An example usage of this feature could be to route failed files to different Boilerplate queue for diagnostics.",
+      "type": "string"
+    },
+    "redactionType": {
+      "description": "Optional. Indicates action to perform on values that match boilerplate expression. Defaults to 'DONOTHING'.",
+      "$ref": "#/definitions/redactionType"
+    },
+    "fields": {
+      "description": "Optional. A list of fields (title, content etc.) to perform boilerplate checking against. If no fields are provided then checking will be performed Boilerplate Handler default fields.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "tagId": {
+      "description": "ID of a Tag. The Policy Item will be evaluated against the Boilerplate Expressions with this Tag.",
+      "type": "integer"
+    },
+    "expressionIds": {
+      "description": "Boilerplate Expression IDs to evaluate against. Either this or 'tagId' must be set.",
+      "type": "array",
+      "items": {
+        "type": "integer"
+      }
+    },
+    "returnMatches": {
+      "default": "true",
+      "description": "Optional. Indicates whether the detail of the boilerplate expression matches should be returned such as the fragments matched.",
+      "type": "boolean"
+    },
+    "emailSegregationRules":{
+      "description": "The field names and expressions to define email key content segregation.",
+      "type":"object",
+      "properties":{
+        "primaryFieldName":{
+          "type": "string",
+          "default": "PRIMARY_CONTENT",
+          "description": "Optional. The field to use for the primary content of the email."
+        },
+        "secondaryFieldName":{
+          "type": "string",
+          "default": "SECONDARY_CONTENT",
+          "description": "Optional. The field to use for the secondary content of the email."
+        },
+        "tertiaryFieldName":{
+          "type": "string",
+          "default": "TERTIARY_CONTENT",
+          "description": "Optional. The field to use for the tertiary  content of the email."
+        },
+        "primaryExpression":{
+          "type": "string",
+          "description":"The expression that defines what is the primary content of the email."
+        },
+        "secondaryExpression":{
+          "type": "string",
+          "description":"The expression that defines what is the secondary content of the email."
+        },
+        "tertiaryExpression":{
+          "type": "string",
+          "description":"The expression that defines what is the tertiary content of the email."
+        }
+      },
+      "required":[
+        "primaryExpression",
+        "secondaryExpression",
+        "tertiaryExpression"
+      ]
+    },
+    "emailSignatureDetection": {
+      "description": "Enable Email Signature Detection mode",
+      "type": "object",
+      "properties": {
+        "extractedEmailSignaturesFieldName": {
+          "description": "Optional. The field to use for extracted email signatures.",
+          "type": "string"
+        },
+        "sender": {
+          "description": "Optional. The email address of the sender.",
+          "type": "string"
+        }
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "required": [
+        "expressionIds"
+      ]
+    },
+    {
+      "required": [
+        "tagId"
+      ]
+    },
+    {
+      "required": [
+        "emailSegregationRules"
+      ]
+    },
+    {
+      "required": [
+        "emailSignatureDetection"
+      ]
+    }
+  ],
+  "title": "Boilerplate Policy Type",
+  "type": "object"
+}

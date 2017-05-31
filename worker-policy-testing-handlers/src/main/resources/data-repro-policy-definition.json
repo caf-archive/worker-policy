@@ -1,0 +1,14 @@
+{
+  "description": "Properties for the data repro test policy.",
+  "properties": {
+    "queueName": {
+      "description": "The queue to send the document to.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "queueName"
+  ],
+  "title": "data repro test policy Type",
+  "type": "object"
+}
