@@ -38,7 +38,7 @@ The Data Processing Worker specific configuration that can be controlled through
 
 ### API
 
-The task message and task result for the worker are described [here](./docs/Data Processing Worker API.md).
+The task message and task result for the worker are described [here](./docs/Data_Processing_Worker_API.md).
 
 ## Handlers/Converters
 

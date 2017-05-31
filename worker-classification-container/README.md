@@ -35,4 +35,4 @@ The Classification Worker specific configuration that can be controlled through 
 
 ### API
 
-The task message and task result for the worker are described [here](./docs/Classification Worker API.md).
+The task message and task result for the worker are described [here](./docs/Classification_Worker_API.md).
