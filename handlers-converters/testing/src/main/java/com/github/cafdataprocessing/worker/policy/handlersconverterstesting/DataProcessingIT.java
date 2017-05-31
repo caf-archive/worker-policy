@@ -31,7 +31,6 @@ import com.github.cafdataprocessing.worker.policy.testing.shared.BaseTestsHelper
 import com.github.cafdataprocessing.worker.policy.testing.shared.IntegrationTestBase;
 import com.github.cafdataprocessing.worker.policy.testing.shared.PolicyTestHelper;
 import com.github.cafdataprocessing.worker.policy.testing.shared.TestDocumentHelper;
-import com.google.common.base.Strings;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.hpe.caf.api.Codec;
@@ -104,6 +103,143 @@ public class DataProcessingIT extends BaseTestsHelper{
             taggingPolicy = policyApi.create(taggingPolicy);
             externalPolicyId = taggingPolicy.id;
             externalPolicyName = taggingPolicy.name;
+
+            //Set up classification sequence
+            ExistsCondition condition = PolicyTestHelper.createExistsCondition("afield", "exists_condition");
+
+            DocumentCollection collection = PolicyTestHelper.createDocumentCollection(classificationApi, "external_classification_collection",
+                    condition, taggingPolicy.id, "external_classification_collection");
+            externalCollectionId = collection.id;
+            externalConditionId = collection.condition.id;
+
+            // Define the sequence that will exist on the external classification worker
+            CollectionSequence externalWorkerSequence = new CollectionSequence();
+            externalWorkerSequence.name = BaseTestsHelper.getUniqueString("External_classification_sequence");
+            externalWorkerSequence.description = "Checks if field exists";
+            externalWorkerSequence.collectionSequenceEntries = new ArrayList<>();
+
+            CollectionSequenceEntry entry = PolicyTestHelper.createCollectionSequenceEntry(collection.id);
+
+            externalWorkerSequence.collectionSequenceEntries.add(entry);
+            externalWorkerSequence = classificationApi.create(externalWorkerSequence);
+            externalSequenceId = externalWorkerSequence.id;
+        }
+
+
+        //Set up workflow sequence
+        Policy genericQueuePolicy = PolicyTestHelper.createGenericQueuePolicy(policyApi, queueOutput);
+        Policy classificationPolicy = PolicyTestHelper.createElasticSearchClassificationPolicy(policyApi, externalSequenceId);
+        StringCondition stringCondition = PolicyTestHelper.createStringCondition("Title", StringOperatorType.CONTAINS, documentName);
+
+        DocumentCollection sendToExternalCollection = PolicyTestHelper.createDocumentCollection(classificationApi, "send to external classification",
+                stringCondition, classificationPolicy.id);
+
+        BooleanCondition booleanCondition = new BooleanCondition();
+        booleanCondition.operator = BooleanOperator.AND;
+
+        DocumentCollection genericQueueCollection = PolicyTestHelper.createDocumentCollection(classificationApi, "send to generic queue",
+                booleanCondition, genericQueuePolicy.id);
+
+        CollectionSequence workflowSequence = new CollectionSequence();
+        workflowSequence.name = BaseTestsHelper.getUniqueString("Workflow");
+        workflowSequence.fullConditionEvaluation = true;
+        CollectionSequenceEntry sequenceEntry = PolicyTestHelper.createCollectionSequenceEntry((short) 100, sendToExternalCollection.id);
+        CollectionSequenceEntry sequenceEntry2 = PolicyTestHelper.createCollectionSequenceEntry((short) 200, genericQueueCollection.id);
+
+        workflowSequence.collectionSequenceEntries = Arrays.asList(sequenceEntry, sequenceEntry2);
+        workflowSequence = classificationApi.create(workflowSequence);
+
+        //create task
+        String taskId = UUID.randomUUID().toString();
+        String taskClassifier = "PolicyWorker";
+        Multimap<String, String> metadata = ArrayListMultimap.create();
+        metadata.put("afield", String.valueOf(1L));
+        metadata.put("Title", documentName);
+        String collectionSequenceId = workflowSequence.id.toString();
+        List<String> collectionSequenceIds = new ArrayList<>();
+        collectionSequenceIds.add(collectionSequenceId);
+        Document document = TestDocumentHelper.createDocument(metadata);
+
+        TaskMessage classifyMessage = createPolicyWorkerTaskMessage(taskId, taskClassifier, document, collectionSequenceIds, true);
+
+        //send task to input queue
+        Channel inputChannel = BaseTestsHelper.rabbitConnection.createChannel();
+        BlockingQueue<Event<QueuePublisher>> pubEvents = createRabbitPublisher(inputChannel);
+
+        //set up consumer for results queue
+        Channel resultsChannel = BaseTestsHelper.rabbitConnection.createChannel();
+        BlockingQueue<Event<QueueConsumer>> conEvents = new LinkedBlockingQueue<>();
+        ConsumerCreationResult consumerResult = createRabbitConsumer(resultsChannel, conEvents, queueOutput, 1, taskId);
+
+        try {
+            final TaskMessage resultWrapper = publishTaskAndAwaitThisMessagesResponse(pubEvents, consumerResult, classifyMessage);
+
+            byte[] returnedTaskData = resultWrapper.getTaskData();
+            //check that task has status of result success
+            checkTaskMessageReturnedTaskStatus(resultWrapper, taskId, TaskStatus.NEW_TASK);
+            //check task data
+            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            SharedDocument taskResponse = mapper.readValue(returnedTaskData, SharedDocument.class);
+            Assert.assertNotNull(taskResponse);
+            CaseInsensitiveMultimap<String> metaData = new CaseInsensitiveMultimap<>();
+            taskResponse.getMetadata().forEach(e -> metaData.put(e.getKey(), e.getValue()));
+            Optional<String> value = metaData.get(ClassificationWorkerConverterFields.CLASSIFICATION_MATCHED_COLLECTION).stream().findFirst();
+            Assert.assertTrue("Document should have POLICY_MATCHED_COLLECTION in meta data", value.isPresent());
+            Assert.assertEquals("Should have matched the classification collection", String.valueOf(externalCollectionId), value.get());
+
+            value = metaData.get(ClassificationWorkerConverterFields.CLASSIFICATION_POLICYID_FIELD).stream().findFirst();
+            Assert.assertTrue("Document should have POLICY_MATCHED_POLICYID in meta data", value.isPresent());
+            Assert.assertEquals("Should have executed Tagging Policy", String.valueOf(externalPolicyId), value.get());
+
+            value = metaData.get(ClassificationWorkerConverterFields.CLASSIFICATION_POLICYNAME_FIELD).stream().findFirst();
+            Assert.assertTrue("Document should have POLICY_MATCHED_POLICYNAME in meta data", value.isPresent());
+            Assert.assertEquals("Should have executed Tagging Policy", externalPolicyName, value.get());
+
+            value = metaData.get(ClassificationWorkerConverterFields.getMatchedConditionField(externalCollectionId)).stream().findFirst();
+            Assert.assertTrue("Document should have " + ClassificationWorkerConverterFields.getMatchedConditionField(externalConditionId)
+                    + " in meta data", value.isPresent());
+            Assert.assertEquals("Should have matched condition", String.valueOf(externalConditionId), value.get());
+        } finally {
+            closeRabbitConnections(resultsChannel, consumerResult);
+        }
+    }
+
+    /**
+     * An external classification test that checks that if the policy matches the style created by classification-service, that the
+     * name returned on the POLICY_MATCHED_POLICYNAME field is extracted from the description of the Policy.
+     * @throws IOException
+     * @throws CodecException
+     * @throws TimeoutException
+     * @throws InterruptedException
+     */
+    @Test
+    public void externalClassificationExtractedPolicyNameTest() throws IOException, CodecException, TimeoutException, InterruptedException {
+        ClassificationApi classificationApi = getClassificationApi();
+        PolicyApi policyApi = IntegrationTestBase.genericApplicationContext.getBean(PolicyApi.class);
+
+        long externalSequenceId;
+        long externalPolicyId;
+        String externalPolicyName;
+        long externalConditionId;
+        long externalCollectionId;
+        String documentName = BaseTestsHelper.getUniqueString("MyDocument");
+        {
+            //set up the sequence on the external classification worker
+            MetadataPolicy metadataPolicy = new MetadataPolicy();
+            metadataPolicy.setFieldActions(new ArrayList<>());
+            FieldAction fieldAction = new FieldAction();
+            fieldAction.setAction(FieldAction.Action.ADD_FIELD_VALUE);
+            fieldAction.setFieldName("EXTERNAL_TEST");
+            fieldAction.setFieldValue("1");
+            metadataPolicy.getFieldActions().add(fieldAction);
+            Policy taggingPolicy = new Policy();
+            taggingPolicy.name = "CLASSIFICATION_CONDITION_ID:1";
+            taggingPolicy.description = "\"{\\\"name\\\":\\\"Meeting Notifications\\\",\\\"description\\\":\\\"Documents that match this classification are Meeting Notifications.\\\"}\"";
+            taggingPolicy.details = mapper.readTree(mapper.writeValueAsString(metadataPolicy));
+            taggingPolicy.typeId = policyApi.retrievePolicyTypeByName("MetadataPolicy").id;
+            taggingPolicy = policyApi.create(taggingPolicy);
+            externalPolicyId = taggingPolicy.id;
+            externalPolicyName = "Meeting Notifications";
 
             //Set up classification sequence
             ExistsCondition condition = PolicyTestHelper.createExistsCondition("afield", "exists_condition");
