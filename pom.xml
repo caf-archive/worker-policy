@@ -105,7 +105,7 @@
         <caf.worker.binaryhash.container.name>cafdataprocessing/worker-binaryhash:2.0.0</caf.worker.binaryhash.container.name>
         <caf.worker.langdetect.container.name>cafdataprocessing/worker-languagedetection:2.0.0</caf.worker.langdetect.container.name>
         <caf.boilerplate.version>2.0.1-7</caf.boilerplate.version>
-        <caf.corepolicy.version>1.0.0-SNAPSHOT</caf.corepolicy.version>
+        <caf.corepolicy.version>1.0.0-4</caf.corepolicy.version>
         <caf.worker-framework.version>1.7.0-211</caf.worker-framework.version>
     </properties>
 
