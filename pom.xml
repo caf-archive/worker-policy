@@ -106,7 +106,7 @@
         <caf.worker.langdetect.container.name>cafdataprocessing/worker-languagedetection:2.0.0</caf.worker.langdetect.container.name>
         <caf.boilerplate.version>2.0.1-7</caf.boilerplate.version>
         <caf.corepolicy.version>1.0.0-4</caf.corepolicy.version>
-        <caf.worker-framework.version>1.7.0-211</caf.worker-framework.version>
+        <caf.worker-framework.version>1.9.0-SNAPSHOT</caf.worker-framework.version>
     </properties>
 
     <dependencyManagement>
