@@ -127,8 +127,8 @@ public abstract class BaseTestsHelper extends IntegrationTestBase
             Channel inputChannel = rabbitConnection.createChannel();
             Channel resultsChannel = rabbitConnection.createChannel();
 
-            RabbitUtil.declareWorkerQueue(inputChannel, INPUT_QUEUENAME);
-            RabbitUtil.declareWorkerQueue(resultsChannel, RESULT_QUEUENAME);
+            RabbitUtil.declareWorkerQueue(inputChannel, INPUT_QUEUENAME, 255);
+            RabbitUtil.declareWorkerQueue(resultsChannel, RESULT_QUEUENAME, 255);
 
             CloseChannel(inputChannel);
             CloseChannel(resultsChannel);
@@ -710,7 +710,7 @@ public abstract class BaseTestsHelper extends IntegrationTestBase
         throws IOException
     {
         CountDownLatch latch = new CountDownLatch(latchCount);
-        RabbitUtil.declareWorkerQueue(resultsChannel, queueName);
+        RabbitUtil.declareWorkerQueue(resultsChannel, queueName, 255);
         this.consumerImpl = new TestQueueConsumerImpl(latch, conEvents, resultsChannel, taskIdFilter);
         this.consumer = new DefaultRabbitConsumer(conEvents, consumerImpl);
         String consumeId = resultsChannel.basicConsume(queueName, consumer);

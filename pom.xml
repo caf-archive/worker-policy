@@ -102,11 +102,11 @@
 
     <properties>
         <caf.base-container.policy-elasticsearch>cafdataprocessing/policy-elasticsearch-container:1.0.0-2</caf.base-container.policy-elasticsearch>
-        <caf.worker.binaryhash.container.name>cafdataprocessing/worker-binaryhash:2.0.0</caf.worker.binaryhash.container.name>
-        <caf.worker.langdetect.container.name>cafdataprocessing/worker-languagedetection:2.0.0</caf.worker.langdetect.container.name>
+        <caf.worker.binaryhash.container.name>cafinternal/prereleases:worker-binaryhash-2.1.0-SNAPSHOT</caf.worker.binaryhash.container.name>
+        <caf.worker.langdetect.container.name>cafinternal/prereleases:worker-languagedetection-2.1.0-SNAPSHOT</caf.worker.langdetect.container.name>
         <caf.boilerplate.version>2.0.1-7</caf.boilerplate.version>
         <caf.corepolicy.version>1.0.0-4</caf.corepolicy.version>
-        <caf.worker-framework.version>1.7.0-211</caf.worker-framework.version>
+        <caf.worker-framework.version>1.9.0-SNAPSHOT</caf.worker-framework.version>
     </properties>
 
     <dependencyManagement>
