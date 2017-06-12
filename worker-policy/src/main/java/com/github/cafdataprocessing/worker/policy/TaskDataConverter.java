@@ -228,7 +228,7 @@ public class TaskDataConverter {
         final String errorMessage
     )
     {
-        logger.error("Adding failure to document metadata %s, %s", workerName, errorMessage);
+        logger.error("Adding failure to document metadata {}, {}", workerName, errorMessage);
 
         // Get the document metadata
         final Multimap<String, String> documentMetadata = document.getMetadata();
