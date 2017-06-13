@@ -43,17 +43,15 @@ import org.slf4j.LoggerFactory;
 
 public class DocumentWorkerHandler extends WorkerTaskResponsePolicyHandler {
 
-    private final DocumentWorkerHandlerProperties properties;
-
     // Logger for logging purposes
     private static final Logger LOG = LoggerFactory.getLogger(DocumentWorkerHandler.class);
 
     public DocumentWorkerHandler(){
-        this.properties = loadWorkerHandlerProperties(DocumentWorkerHandlerProperties.class);
     }
 
     @Override
     protected WorkerHandlerResponse handleTaskPolicy(Document document, Policy policy, Long aLong, TaskData taskData) throws InvalidTaskException {
+        final DocumentWorkerHandlerProperties properties = loadWorkerHandlerProperties(DocumentWorkerHandlerProperties.class);
         DocumentWorkerTask task = new DocumentWorkerTask();
         ObjectMapper mapper = new ObjectMapper();
 

@@ -18,9 +18,11 @@ package com.github.cafdataprocessing.worker.policy.handlers.documentworker;
 import com.github.cafdataprocessing.worker.policy.handlers.shared.HandlerProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 import org.springframework.core.env.Environment;
 
 @Configuration
+@Scope("prototype")
 public class DocumentWorkerHandlerProperties implements HandlerProperties {
 
     @Autowired
