@@ -252,7 +252,7 @@ public class DocumentWorkerHandler extends WorkerTaskResponsePolicyHandler {
         }
 
         if (sourceValue.equals("inlineJson")) {
-            return escapeInlineJson((Map)value, mapper);
+            return encodeInlineJson((Map)value, mapper);
         }
 
         if (sourceValue.equals("projectId")) {
@@ -268,16 +268,16 @@ public class DocumentWorkerHandler extends WorkerTaskResponsePolicyHandler {
         return null;
     }
 
-    private static String escapeInlineJson(final Map value, final ObjectMapper mapper)
+    private static String encodeInlineJson(final Map value, final ObjectMapper mapper)
     {
-        // Get the JSON data from the Map and check that it is a Map
+        // Get the 'data' object from the supplied value and check that it is a Map.
         final Object data = value.get("data");
-
         if (!(data instanceof Map)) {
             LOG.warn("The customData inlineJson object 'data' is not specified or is not a map. Skipping...");
             return null;
         }
 
+        // Encode the 'data' object as a JSON-escaped string.
         try {
             return mapper.writeValueAsString(data);
         } catch (JsonProcessingException e) {
