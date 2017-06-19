@@ -246,20 +246,29 @@ public class DocumentWorkerHandler extends WorkerTaskResponsePolicyHandler {
             return null;
         }
 
+        return resolveSourceValue((String)sourceValue, (Map)value, taskData, mapper);
+    }
+
+    private static String resolveSourceValue(final String sourceValue, final Map value, final TaskData taskData, final ObjectMapper mapper)
+    {
         // Call the appropriate function based on the source
-        if (sourceValue.equals("dataStorePartialReference")) {
+        if ("dataStorePartialReference".equals(sourceValue))
+        {
             return taskData.getOutputPartialReference();
         }
 
-        if (sourceValue.equals("inlineJson")) {
-            return encodeInlineJson((Map)value, mapper);
+        if ("inlineJson".equals(sourceValue))
+        {
+            return encodeInlineJson(value, mapper);
         }
 
-        if (sourceValue.equals("projectId")) {
+        if ("projectId".equals(sourceValue))
+        {
             return taskData.getProjectId();
         }
 
-        if (sourceValue.equals("workflowId")) {
+        if ("workflowId".equals(sourceValue))
+        {
             return taskData.getWorkflowId();
         }
 
@@ -270,12 +279,7 @@ public class DocumentWorkerHandler extends WorkerTaskResponsePolicyHandler {
 
     private static String encodeInlineJson(final Map value, final ObjectMapper mapper)
     {
-        // Get the 'data' object from the supplied value and check that it is a Map.
         final Object data = value.get("data");
-        if (!(data instanceof Map)) {
-            LOG.warn("The customData inlineJson object 'data' is not specified or is not a map. Skipping...");
-            return null;
-        }
 
         // Encode the 'data' object as a JSON-escaped string.
         try {
