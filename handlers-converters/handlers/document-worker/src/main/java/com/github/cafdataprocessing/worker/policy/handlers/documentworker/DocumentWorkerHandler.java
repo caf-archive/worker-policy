@@ -15,6 +15,7 @@
  */
 package com.github.cafdataprocessing.worker.policy.handlers.documentworker;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.cafdataprocessing.corepolicy.common.Document;
@@ -67,7 +68,7 @@ public class DocumentWorkerHandler extends WorkerTaskResponsePolicyHandler {
             final String key = customDataEntry.getKey();
             final Object value = customDataEntry.getValue();
 
-            final String parsedValue = parseCustomDataValue(value, taskData);
+            final String parsedValue = parseCustomDataValue(value, taskData, mapper);
 
             // If the value passed into parseCustomDataValue is not a supported datatype or is incorrect, then null will be returned.
             // This ensures that incomplete key-value pairs are not added to customData.
@@ -215,9 +216,10 @@ public class DocumentWorkerHandler extends WorkerTaskResponsePolicyHandler {
      *
      * @param value the value from the customData map
      * @param taskData the PolicyWorker object which provides the context the handler is running in
+     * @param mapper the object mapper to use for JSON value conversions
      * @return the value to be added to the customData to be sent to the worker, or null if the value should be ignored
      */
-    private static String parseCustomDataValue(final Object value, final TaskData taskData)
+    private static String parseCustomDataValue(final Object value, final TaskData taskData, final ObjectMapper mapper)
     {
         // If value is null then it can be ignored
         if (value == null) {
@@ -249,6 +251,10 @@ public class DocumentWorkerHandler extends WorkerTaskResponsePolicyHandler {
             return taskData.getOutputPartialReference();
         }
 
+        if (sourceValue.equals("inlineJson")) {
+            return escapeInlineJson((Map)value, mapper);
+        }
+
         if (sourceValue.equals("projectId")) {
             return taskData.getProjectId();
         }
@@ -260,5 +266,23 @@ public class DocumentWorkerHandler extends WorkerTaskResponsePolicyHandler {
         // The source value is not recognised
         LOG.warn("The customData object 'source' is not recognised. Skipping...");
         return null;
+    }
+
+    private static String escapeInlineJson(final Map value, final ObjectMapper mapper)
+    {
+        // Get the JSON data from the Map and check that it is a Map
+        final Object data = value.get("data");
+
+        if (!(data instanceof Map)) {
+            LOG.warn("The customData inlineJson object 'data' is not specified or is not a map. Skipping...");
+            return null;
+        }
+
+        try {
+            return mapper.writeValueAsString(data);
+        } catch (JsonProcessingException e) {
+            LOG.warn("The customData inlineJson object 'data' could not be JSON-encoded. Skipping...");
+            return null;
+        }
     }
 }
