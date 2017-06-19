@@ -90,7 +90,7 @@ Key-Value pairs are extracted as any other Key-Value pair. The handler will extr
 
 ##### Map within customData
 
-A Key-Value pair (or Map) within customData can have another Key-Value pair nested in it's value. The handler drills down into the value of the top level Map and extracts the value of the nested Map. In order for the handler to find the value, **the nested Map must have a "source" key**.
+A Key-Value pair (or Map) within customData can have another Key-Value pair nested in its value. The handler drills down into the value of the top level Map and extracts the value of the nested Map. In order for the handler to find the value, **the nested Map must have a "source" key**.
 
 The code-blocks below show how you can pass the `dataStorePartialReference` and `projectId` fields into a Document Worker. The handler looks for `"source"` and extracts the related value. What is passed through to the worker will depend on what the source value is. For example, if `value == "dataStorePartialReference"`, then the handler will call a method to request the OutputPartialReference from `taskData`. The reference will be passed through to the worker. Similar functionality is performed when looking for the Tenant ID.
 
@@ -114,6 +114,48 @@ The code-blocks below show how you can pass the `dataStorePartialReference` and 
 }
 </pre>
 
+
+It is also possible to supply a JSON object as a value within the nested map. In this case, **the `"source"` value must be `"inlineJson"` and the nested map must also include a `"data"` key, the value of which is the JSON object to be supplied**. This allows objects to be supplied without encoding in the policy definition, for example:
+
+<pre>
+{
+  "workerName": "DirectoryLookupWorker",
+  "customData":
+  {  
+    "someSetting": {  
+      "source": "inlineJson",
+      "data": {  
+        "object": {  
+          "key":" value",
+          "array": [  
+            {  
+              "null_value": null
+            },
+            {  
+              "boolean": true
+            },
+            {  
+              "integer": 1
+            }
+          ]
+        }
+      }
+    }
+  }
+}
+</pre>
+
+The handler takes care of JSON-encoding the object. The above example is exactly equivalent to the following, which would make for a less readable policy definition:
+
+<pre>
+{
+  "workerName": "DirectoryLookupWorker",
+  "customData":
+  {
+    "someSetting": "{\"object\":{\"key\":\"value\",\"array\":[{\"null_value\":null},{\"boolean\":true},{\"integer\":1}]}}"
+  }
+}
+</pre>
 
 
 ##### Variations within customData

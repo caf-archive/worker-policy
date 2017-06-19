@@ -227,7 +227,115 @@ public class DocumentWorkerHandlerTest {
         
         Assert.assertTrue(task.customData.containsValue(outputTenantId));
     }
-    
+
+    @Test
+    public void testCustomDataEscapedJsonObjectField() throws IOException
+    {
+        Document document = setupDocument();
+
+        Policy testPolicy = new Policy();
+        testPolicy.id = 1L;
+
+        ObjectMapper mapper = new ObjectMapper();
+        testPolicy.details = mapper.readTree(
+                "{\n" +
+				"  \"workerName\": \"DocWorkerName\",\n" +
+				"  \"customData\": {\n" +
+				"    \"someSetting\": \"{\\\"object\\\":{\\\"key\\\":\\\"value\\\",\\\"array\\\":[{\\\"null_value\\\":null},{\\\"boolean\\\":true},{\\\"integer\\\":1}]}}\"\n" +
+				"  }\n" +
+				"}");
+
+        final Long testColSeqId = 1L;
+
+        WorkerResponseHolder responseHolder = applicationContext.getBean(WorkerResponseHolder.class);
+        responseHolder.setTaskData(new TaskData());
+
+        handler.handle(document, testPolicy, testColSeqId);
+
+        WorkerResponseHolder workerResponseHolder = applicationContext.getBean(WorkerResponseHolder.class);
+        WorkerTaskResponsePolicyHandler.WorkerHandlerResponse response = workerResponseHolder.getChainWorkerResponse();
+        Assert.assertNotNull(response);
+
+        DocumentWorkerTask task = (DocumentWorkerTask) response.getData();
+        Assert.assertNotNull(task);
+
+        Assert.assertTrue(task.customData.containsKey("someSetting"));
+        final String escapedJsonObjectValue = task.customData.get("someSetting");
+        Assert.assertEquals("{\"object\":{\"key\":\"value\",\"array\":[{\"null_value\":null},{\"boolean\":true},{\"integer\":1}]}}", escapedJsonObjectValue);
+    }
+
+    @Test
+    public void testCustomDataJsonObjectField() throws IOException
+    {
+        Document document = setupDocument();
+
+        Policy testPolicy = new Policy();
+        testPolicy.id = 1L;
+
+        ObjectMapper mapper = new ObjectMapper();
+        testPolicy.details = mapper.readTree(
+                "{\n" +
+				"  \"workerName\": \"DocWorkerName\",\n" +
+				"  \"customData\": {  \n" +
+				"    \"objectSetting\": {  \n" +
+				"      \"source\": \"inlineJson\",\n" +
+				"      \"data\": {  \n" +
+				"        \"object\": {  \n" +
+				"          \"key\":\"value\",\n" +
+				"          \"array\": [  \n" +
+				"            {  \n" +
+				"              \"null_value\": null\n" +
+				"            },\n" +
+				"            {  \n" +
+				"              \"boolean\": true\n" +
+				"            },\n" +
+				"            {  \n" +
+				"              \"integer\": 1\n" +
+				"            }\n" +
+				"          ]\n" +
+				"        }\n" +
+				"      }\n" +
+				"    },\n" +
+				"    \"arraySetting\": {  \n" +
+				"      \"source\": \"inlineJson\",\n" +
+				"      \"data\": [\n" +
+				"        {\n" +
+				"          \"boolean\": false\n" +
+				"        },\n" +
+				"        {\n" +
+				"          \"integer\": 42\n" +
+				"        },\n" +
+				"        {\n" +
+				"          \"string_value\": \"hello\"\n" +
+				"        }\n" +
+				"      ]\n" +
+				"    }\n" +
+				"  }\n" +
+				"}");
+
+        final Long testColSeqId = 1L;
+
+        WorkerResponseHolder responseHolder = applicationContext.getBean(WorkerResponseHolder.class);
+        responseHolder.setTaskData(new TaskData());
+
+        handler.handle(document, testPolicy, testColSeqId);
+
+        WorkerResponseHolder workerResponseHolder = applicationContext.getBean(WorkerResponseHolder.class);
+        WorkerTaskResponsePolicyHandler.WorkerHandlerResponse response = workerResponseHolder.getChainWorkerResponse();
+        Assert.assertNotNull(response);
+
+        DocumentWorkerTask task = (DocumentWorkerTask) response.getData();
+        Assert.assertNotNull(task);
+
+        Assert.assertTrue(task.customData.containsKey("objectSetting"));
+        final String escapedJsonObjectValue = task.customData.get("objectSetting");
+        Assert.assertEquals("{\"object\":{\"key\":\"value\",\"array\":[{\"null_value\":null},{\"boolean\":true},{\"integer\":1}]}}", escapedJsonObjectValue);
+
+        Assert.assertTrue(task.customData.containsKey("arraySetting"));
+        final String escapedJsonArrayValue = task.customData.get("arraySetting");
+        Assert.assertEquals("[{\"boolean\":false},{\"integer\":42},{\"string_value\":\"hello\"}]", escapedJsonArrayValue);
+    }
+
     @Test
     public void testCustomDataFieldEmpty() throws IOException
     {
