@@ -239,11 +239,11 @@ public class DocumentWorkerHandlerTest {
         ObjectMapper mapper = new ObjectMapper();
         testPolicy.details = mapper.readTree(
                 "{\n" +
-                        "  \"workerName\": \"DocWorkerName\",\n" +
-                        "  \"customData\": {\n" +
-                        "    \"someSetting\": \"{\\\"object\\\":{\\\"key\\\":\\\"value\\\",\\\"array\\\":[{\\\"null_value\\\":null},{\\\"boolean\\\":true},{\\\"integer\\\":1}]}}\"\n" +
-                        "  }\n" +
-                        "}");
+				"  \"workerName\": \"DocWorkerName\",\n" +
+				"  \"customData\": {\n" +
+				"    \"someSetting\": \"{\\\"object\\\":{\\\"key\\\":\\\"value\\\",\\\"array\\\":[{\\\"null_value\\\":null},{\\\"boolean\\\":true},{\\\"integer\\\":1}]}}\"\n" +
+				"  }\n" +
+				"}");
 
         final Long testColSeqId = 1L;
 
@@ -275,43 +275,43 @@ public class DocumentWorkerHandlerTest {
         ObjectMapper mapper = new ObjectMapper();
         testPolicy.details = mapper.readTree(
                 "{\n" +
-                        "  \"workerName\": \"DocWorkerName\",\n" +
-                        "  \"customData\": {  \n" +
-                        "    \"objectSetting\": {  \n" +
-                        "      \"source\": \"inlineJson\",\n" +
-                        "      \"data\": {  \n" +
-                        "        \"object\": {  \n" +
-                        "          \"key\":\"value\",\n" +
-                        "          \"array\": [  \n" +
-                        "            {  \n" +
-                        "              \"null_value\": null\n" +
-                        "            },\n" +
-                        "            {  \n" +
-                        "              \"boolean\": true\n" +
-                        "            },\n" +
-                        "            {  \n" +
-                        "              \"integer\": 1\n" +
-                        "            }\n" +
-                        "          ]\n" +
-                        "        }\n" +
-                        "      }\n" +
-                        "    },\n" +
-                        "    \"arraySetting\": {  \n" +
-                        "      \"source\": \"inlineJson\",\n" +
-                        "      \"data\": [\n" +
-                        "        {\n" +
-                        "          \"boolean\": false\n" +
-                        "        },\n" +
-                        "        {\n" +
-                        "          \"integer\": 42\n" +
-                        "        },\n" +
-                        "        {\n" +
-                        "          \"string_value\": \"hello\"\n" +
-                        "        }\n" +
-                        "      ]\n" +
-                        "    }\n" +
-                        "  }\n" +
-                        "}");
+				"  \"workerName\": \"DocWorkerName\",\n" +
+				"  \"customData\": {  \n" +
+				"    \"objectSetting\": {  \n" +
+				"      \"source\": \"inlineJson\",\n" +
+				"      \"data\": {  \n" +
+				"        \"object\": {  \n" +
+				"          \"key\":\"value\",\n" +
+				"          \"array\": [  \n" +
+				"            {  \n" +
+				"              \"null_value\": null\n" +
+				"            },\n" +
+				"            {  \n" +
+				"              \"boolean\": true\n" +
+				"            },\n" +
+				"            {  \n" +
+				"              \"integer\": 1\n" +
+				"            }\n" +
+				"          ]\n" +
+				"        }\n" +
+				"      }\n" +
+				"    },\n" +
+				"    \"arraySetting\": {  \n" +
+				"      \"source\": \"inlineJson\",\n" +
+				"      \"data\": [\n" +
+				"        {\n" +
+				"          \"boolean\": false\n" +
+				"        },\n" +
+				"        {\n" +
+				"          \"integer\": 42\n" +
+				"        },\n" +
+				"        {\n" +
+				"          \"string_value\": \"hello\"\n" +
+				"        }\n" +
+				"      ]\n" +
+				"    }\n" +
+				"  }\n" +
+				"}");
 
         final Long testColSeqId = 1L;
 
