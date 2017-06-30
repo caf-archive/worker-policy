@@ -36,7 +36,7 @@ import com.github.cafdataprocessing.worker.policy.shared.TaskData;
 import com.github.cafdataprocessing.worker.policy.data.reprocessing.tracking.TrackedDocument;
 import com.hpe.caf.api.CodecException;
 import com.hpe.caf.api.worker.*;
-import com.hpe.caf.codec.JsonCodec;
+import com.hpe.caf.codec.JsonLzfCodec;
 import com.hpe.caf.util.ref.DataSourceException;
 import com.hpe.caf.util.ref.SourceNotFoundException;
 import org.slf4j.Logger;
@@ -238,7 +238,7 @@ public class ExecuteTaskData {
         this.policyWorker.getTaskDataConverter().updateObjectWithTaskData(workerHandlerResponse.getMessageType(),
                 workerHandlerResponse.getApiVersion(), workerHandlerResponse.getData(), taskData);
 
-        JsonCodec policyCodec = new JsonCodec();
+        JsonLzfCodec policyCodec = new JsonLzfCodec();
 
         WorkerResponse workerResponse;
         try {
