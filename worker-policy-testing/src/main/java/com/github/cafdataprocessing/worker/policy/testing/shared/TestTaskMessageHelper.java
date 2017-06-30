@@ -17,11 +17,12 @@ package com.github.cafdataprocessing.worker.policy.testing.shared;
 
 import com.github.cafdataprocessing.worker.policy.shared.Document;
 import com.github.cafdataprocessing.worker.policy.shared.TaskData;
+import com.hpe.caf.api.Codec;
 import com.hpe.caf.api.CodecException;
 import com.hpe.caf.api.worker.TaskMessage;
 import com.hpe.caf.api.worker.TaskStatus;
 import com.hpe.caf.api.worker.TrackingInfo;
-import com.hpe.caf.codec.JsonCodec;
+import com.hpe.caf.codec.JsonLzfCodec;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -31,7 +32,7 @@ import java.util.List;
  * Helper methods for working with TaskMessage class during testing.
  */
 public class TestTaskMessageHelper {
-    public static JsonCodec codec = new JsonCodec();
+    public static Codec codec = new JsonLzfCodec();
     private static final int TASK_API_VERSION = 1;
     
     /**

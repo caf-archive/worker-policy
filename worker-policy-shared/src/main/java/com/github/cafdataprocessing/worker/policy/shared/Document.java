@@ -20,7 +20,6 @@ import com.github.cafdataprocessing.entity.fields.DocumentProcessingRecord;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.hpe.caf.util.ref.ReferencedData;
-
 import java.util.Collection;
 
 /**

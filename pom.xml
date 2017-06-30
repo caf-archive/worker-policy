@@ -96,7 +96,7 @@
         <module>worker-policy-type-registrant</module>
         <module>worker-policy-testing-handlers</module>
         <module>worker-policy-testing</module>
-        <module>worker-classification-container</module>
+        <!--<module>worker-classification-container</module>-->
         <module>worker-data-processing-container</module>
     </modules>
 
@@ -149,7 +149,7 @@
             <dependency>
                 <groupId>com.github.cafdataprocessing</groupId>
                 <artifactId>worker-document-shared</artifactId>
-                <version>2.1.0-15</version>
+                <version>2.3.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafdataprocessing</groupId>
