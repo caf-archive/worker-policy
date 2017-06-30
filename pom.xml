@@ -106,7 +106,7 @@
         <caf.worker.langdetect.container.name>cafinternal/prereleases:worker-languagedetection-2.1.0-27</caf.worker.langdetect.container.name>
         <caf.boilerplate.version>2.0.1-7</caf.boilerplate.version>
         <caf.corepolicy.version>1.0.0-4</caf.corepolicy.version>
-        <caf.worker-framework.version>2.0.0-SNAPSHOT</caf.worker-framework.version>
+        <caf.worker-framework.version>2.0.0-PERF_JSON_LZF_CODEC-SNAPSHOT</caf.worker-framework.version>
     </properties>
 
     <dependencyManagement>
