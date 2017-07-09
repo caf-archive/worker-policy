@@ -26,7 +26,6 @@ import com.github.cafdataprocessing.worker.policy.WorkerResponseHolder;
 import com.github.cafdataprocessing.worker.policy.WorkerTaskResponsePolicyHandler;
 import com.github.cafdataprocessing.worker.policy.shared.TaskData;
 import com.google.common.base.Strings;
-import com.google.common.collect.Multimap;
 import com.hpe.caf.api.worker.InvalidTaskException;
 import com.hpe.caf.api.worker.TaskStatus;
 import com.hpe.caf.util.ref.ReferencedData;
@@ -60,8 +59,8 @@ public class CompositeDocumentWorkerHandler extends WorkerTaskResponsePolicyHand
     {
         final CompositeDocumentWorkerHandlerProperties properties = loadWorkerHandlerProperties(CompositeDocumentWorkerHandlerProperties.class);
         final DocumentWorkerDocumentTask task = new DocumentWorkerDocumentTask();
-        final DocumentWorkerDocument documentWorkerDocument = new DocumentWorkerDocument();
-        documentWorkerDocument.reference = document.getReference();
+        task.document = new DocumentWorkerDocument();
+        task.document.reference = document.getReference();
         final ObjectMapper mapper = new ObjectMapper();
 
         LOG.info("Retrieving policy definition...");
@@ -93,10 +92,10 @@ public class CompositeDocumentWorkerHandler extends WorkerTaskResponsePolicyHand
         }
 
         //  Gather fields for Document Worker task.
-        documentWorkerDocument.fields = getFieldsData(policyDef.fields, document);
+        task.document.fields = getFieldsData(policyDef.fields, document);
 
         //  Gather sub-files for document worker document to be provided on task.
-        copySubFiles(document.getDocuments(), documentWorkerDocument);
+        copySubFiles(document.getDocuments(), task.document);
 
         //  Get the appropriate queue name based on whether a failure has happened or not.
         String queueName = getQueueName(policyDef, properties);
@@ -105,8 +104,6 @@ public class CompositeDocumentWorkerHandler extends WorkerTaskResponsePolicyHand
         if (Strings.isNullOrEmpty(queueName) && hasFailureHappened()) {
             return null;
         }
-
-        task.document = documentWorkerDocument;
         return new WorkerHandlerResponse(
             queueName,
             TaskStatus.NEW_TASK,
@@ -128,9 +125,9 @@ public class CompositeDocumentWorkerHandler extends WorkerTaskResponsePolicyHand
             logger.error("Could not deserialize DocumentPolicyType definition", e);
         }
         policyType.definition = definition;
-        policyType.description = "Enriches a document";
-        policyType.name = "Document Policy Type";
-        policyType.shortName = "DocumentWorkerHandler";
+        policyType.description = "Enriches a family of documents";
+        policyType.name = "Composite Document Policy Type";
+        policyType.shortName = "CompositeDocumentWorkerHandler";
         return policyType;
     }
 
@@ -187,7 +184,7 @@ public class CompositeDocumentWorkerHandler extends WorkerTaskResponsePolicyHand
          * for matching a key against it. Else return the predicate for matching a key against the filter field name.
          */
         if (filterFieldName.contains("*")) {
-            String[] splitFieldFieldName = filterFieldName.split("\\*", -1);
+            final String[] splitFieldFieldName = filterFieldName.split("\\*", -1);
             for (int i = 0; i < splitFieldFieldName.length; i++) {
                 splitFieldFieldName[i] = Pattern.quote(splitFieldFieldName[i].toUpperCase());
             }
@@ -212,14 +209,14 @@ public class CompositeDocumentWorkerHandler extends WorkerTaskResponsePolicyHand
 
     private static DocumentWorkerFieldValue createWorkerData(String value)
     {
-        DocumentWorkerFieldValue workerData = new DocumentWorkerFieldValue();
+        final DocumentWorkerFieldValue workerData = new DocumentWorkerFieldValue();
         workerData.data = value;
         return workerData;
     }
 
     private static DocumentWorkerFieldValue createWorkerData(ReferencedData value)
     {
-        DocumentWorkerFieldValue workerData = new DocumentWorkerFieldValue();
+        final DocumentWorkerFieldValue workerData = new DocumentWorkerFieldValue();
 
         if (value.getData() != null) {
             workerData.data = Base64.getEncoder().encodeToString(value.getData());
