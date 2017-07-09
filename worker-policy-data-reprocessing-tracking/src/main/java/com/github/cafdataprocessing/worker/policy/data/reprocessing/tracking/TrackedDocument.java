@@ -21,6 +21,9 @@ import com.google.common.collect.Multimap;
 import com.github.cafdataprocessing.worker.policy.shared.DocumentInterface;
 import com.github.cafdataprocessing.entity.fields.*;
 import com.hpe.caf.util.ref.ReferencedData;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +41,7 @@ public class TrackedDocument extends TrackedDocumentInternal implements Document
     // made on them, like getMetadata().put(key,value);
     private TrackedMultiMap<String, String> trackedMetadata;
     private TrackedMultiMap<String, ReferencedData> trackedMetadataRefs;
+    private Collection<DocumentInterface> trackedSubDocuments;
             
     /**
      * Constructor to create a blank TrackedDocument.
@@ -134,7 +138,41 @@ public class TrackedDocument extends TrackedDocumentInternal implements Document
     public void deletePolicyDataProcessingRecord() {
         trackedDocumentChanger.getInternalDocument().deletePolicyDataProcessingRecord();
     }
-    
-   
-    
+
+    @Override
+    public Collection<DocumentInterface> getSubDocuments()
+    {
+        if (trackedSubDocuments == null) {
+            Collection<DocumentInterface> trackedsubDocumentsCollection = new ArrayList<>();
+            trackedDocumentChanger.getInternalDocument().getSubDocuments().forEach((document) -> {
+                trackedsubDocumentsCollection.add(new TrackedDocument(document));
+            });
+            this.trackedSubDocuments = trackedsubDocumentsCollection;
+        }
+        return Collections.unmodifiableCollection(trackedSubDocuments);
+    }
+
+    @Override
+    public void removeSubdocument(final String reference)
+    {
+        trackedDocumentChanger.getInternalDocument().getSubDocuments().stream().forEach(doc -> {
+            if (doc.getReference().equals(reference)) {
+                trackedDocumentChanger.getInternalDocument().removeSubdocument(reference);
+            }
+        });
+        trackedSubDocuments.stream().forEach(doc -> {
+            if (doc.getReference().equals(reference)) {
+                trackedSubDocuments.remove(doc);
+            }
+        });
+    }
+
+    @Override
+    public DocumentInterface addSubDocument(final String reference)
+    {
+        DocumentInterface document = trackedDocumentChanger.getInternalDocument().addSubDocument(reference);
+        TrackedDocument trackedDocument = new TrackedDocument(document);
+        trackedSubDocuments.add(trackedDocument);
+        return trackedDocument;
+    }
 }
