@@ -144,6 +144,7 @@ public class Document implements DocumentInterface {
         documents.stream().forEach(doc -> {
             if (doc.getReference().equals(reference)) {
                 documents.remove(doc);
+                return;
             }
         });
     }

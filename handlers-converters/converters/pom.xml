@@ -32,7 +32,7 @@
         <module>boilerplate</module>
         <module>classification</module>
         <module>document-worker</module>
+        <module>composite-document</module>
         <module>markup</module>
-        <module>worker-policy-composite-document-converter</module>
     </modules>
 </project>

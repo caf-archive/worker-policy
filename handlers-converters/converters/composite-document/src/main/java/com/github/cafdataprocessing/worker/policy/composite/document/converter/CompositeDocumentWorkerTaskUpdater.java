@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Hewlett Packard Enterprise Development LP.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development LP.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -144,6 +144,10 @@ public final class CompositeDocumentWorkerTaskUpdater
                                     fieldEntryChange.getKey(), ReferencedData.getWrappedData(databyte), document);
                             }
                             break;
+
+                            default: {
+                                throw new RuntimeException("Encoding type not recognised, ecoding should be of type base64, utf8 or storage_ref.");
+                            }
                         }
                     }
                 }

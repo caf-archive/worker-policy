@@ -158,11 +158,13 @@ public class TrackedDocument extends TrackedDocumentInternal implements Document
         trackedDocumentChanger.getInternalDocument().getSubDocuments().stream().forEach(doc -> {
             if (doc.getReference().equals(reference)) {
                 trackedDocumentChanger.getInternalDocument().removeSubdocument(reference);
+                return;
             }
         });
         trackedSubDocuments.stream().forEach(doc -> {
             if (doc.getReference().equals(reference)) {
                 trackedSubDocuments.remove(doc);
+                return;
             }
         });
     }
