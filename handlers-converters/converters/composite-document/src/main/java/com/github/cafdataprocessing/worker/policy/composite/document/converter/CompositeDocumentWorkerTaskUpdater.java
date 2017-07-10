@@ -94,6 +94,8 @@ public final class CompositeDocumentWorkerTaskUpdater
 
         final InsertSubdocumentParams insertSubdocumentParams = change.insertSubdocument;
         if (insertSubdocumentParams != null) {
+            // The ability to insert at an index is not supported in a DocumentInterface object as subfiles are held
+            // in an unordered Collection, the document is simply added to the Collection.
             addSubDocument(insertSubdocumentParams.subdocument, document);
         }
 
@@ -146,7 +148,7 @@ public final class CompositeDocumentWorkerTaskUpdater
                             break;
 
                             default: {
-                                throw new RuntimeException("Encoding type not recognised, ecoding should be of type base64, utf8 or storage_ref.");
+                                throw new RuntimeException("Encoding type not recognised, encoding should be of type base64, utf8 or storage_ref.");
                             }
                         }
                     }
