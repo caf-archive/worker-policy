@@ -22,6 +22,7 @@ import com.google.common.collect.Multimap;
 import com.hpe.caf.util.ref.ReferencedData;
 
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * A document to be collated against a collection sequence and it's contained collections and conditions.
@@ -85,6 +86,11 @@ public class Document implements DocumentInterface {
         this.reference = reference;
     }
 
+    @Override
+    public Collection<DocumentInterface> getSubDocuments() {
+        return Collections.unmodifiableCollection(documents);
+    }
+
     public Collection<Document> getDocuments() {
         return documents;
     }
@@ -130,5 +136,25 @@ public class Document implements DocumentInterface {
     public void setPolicyDataProcessingRecord(
             DocumentProcessingRecord policyDataProcessingRecord ) {
         this.policyDataProcessingRecord = policyDataProcessingRecord;
+    }
+
+    @Override
+    public void removeSubdocument(String reference)
+    {
+        documents.stream().forEach(doc -> {
+            if (doc.getReference().equals(reference)) {
+                documents.remove(doc);
+                return;
+            }
+        });
+    }
+
+    @Override
+    public DocumentInterface addSubDocument(String reference)
+    {
+        Document document = new Document();
+        document.setReference(reference);
+        documents.add(document);
+        return document;
     }
 }
