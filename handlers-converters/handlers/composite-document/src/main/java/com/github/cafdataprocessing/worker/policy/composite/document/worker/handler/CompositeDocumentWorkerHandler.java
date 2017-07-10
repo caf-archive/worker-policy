@@ -54,7 +54,7 @@ public class CompositeDocumentWorkerHandler extends WorkerTaskResponsePolicyHand
     }
 
     @Override
-    protected WorkerHandlerResponse handleTaskPolicy(Document document, Policy policy, Long aLong, TaskData taskData)
+    protected WorkerHandlerResponse handleTaskPolicy(final Document document, final Policy policy, final Long aLong, final TaskData taskData)
         throws InvalidTaskException
     {
         final CompositeDocumentWorkerHandlerProperties properties = loadWorkerHandlerProperties(CompositeDocumentWorkerHandlerProperties.class);
@@ -132,12 +132,12 @@ public class CompositeDocumentWorkerHandler extends WorkerTaskResponsePolicyHand
     }
 
     @Override
-    public Collection<Policy> resolve(Document document, Collection<Policy> collection)
+    public Collection<Policy> resolve(final Document document, final Collection<Policy> collection)
     {
         return null;
     }
 
-    private Map<String, List<DocumentWorkerFieldValue>> getFieldsData(Set<String> policyDefFields, Document document)
+    private Map<String, List<DocumentWorkerFieldValue>> getFieldsData(final Set<String> policyDefFields, final Document document)
     {
         final Map<String, List<DocumentWorkerFieldValue>> fieldsMap = new HashMap<>();
 
@@ -177,7 +177,7 @@ public class CompositeDocumentWorkerHandler extends WorkerTaskResponsePolicyHand
         return fieldsMap;
     }
 
-    private Predicate<String> getKeyToFilterFieldNameMatchPredicate(String filterFieldName)
+    private Predicate<String> getKeyToFilterFieldNameMatchPredicate(final String filterFieldName)
     {
         /**
          * If the filter field name contains an asterisk for wildcard matching transform it for regex matching and return the predicate
@@ -207,14 +207,14 @@ public class CompositeDocumentWorkerHandler extends WorkerTaskResponsePolicyHand
         data.add(workerData);
     }
 
-    private static DocumentWorkerFieldValue createWorkerData(String value)
+    private static DocumentWorkerFieldValue createWorkerData(final String value)
     {
         final DocumentWorkerFieldValue workerData = new DocumentWorkerFieldValue();
         workerData.data = value;
         return workerData;
     }
 
-    private static DocumentWorkerFieldValue createWorkerData(ReferencedData value)
+    private static DocumentWorkerFieldValue createWorkerData(final ReferencedData value)
     {
         final DocumentWorkerFieldValue workerData = new DocumentWorkerFieldValue();
 
