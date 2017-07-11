@@ -49,10 +49,6 @@ public class CompositeDocumentWorkerHandler extends WorkerTaskResponsePolicyHand
     // Logger for logging purposes
     private static final Logger LOG = LoggerFactory.getLogger(CompositeDocumentWorkerHandler.class);
 
-    public CompositeDocumentWorkerHandler()
-    {
-    }
-
     @Override
     protected WorkerHandlerResponse handleTaskPolicy(final Document document, final Policy policy, final Long aLong, final TaskData taskData)
         throws InvalidTaskException
@@ -120,7 +116,7 @@ public class CompositeDocumentWorkerHandler extends WorkerTaskResponsePolicyHand
         final ObjectMapper m = new ObjectMapper();
         JsonNode definition = null;
         try {
-            definition = m.readTree(this.getClass().getResource("/document-policy-definition.json"));
+            definition = m.readTree(this.getClass().getResource("/composite-document-policy-definition.json"));
         } catch (IOException e) {
             logger.error("Could not deserialize DocumentPolicyType definition", e);
         }
@@ -309,16 +305,17 @@ public class CompositeDocumentWorkerHandler extends WorkerTaskResponsePolicyHand
 
     private void copySubFiles(final Collection<Document> documents, final DocumentWorkerDocument document)
     {
-        documents.stream().map((doc) -> {
+        if(document.subdocuments == null){
+            document.subdocuments = new ArrayList();
+        }
+        for (Document doc : documents) {
             DocumentWorkerDocument subDoc = new DocumentWorkerDocument();
             subDoc.reference = doc.getReference();
             subDoc.fields = getFieldsData(null, doc);
-            if (doc.getDocuments() != null) {
+            if (doc.getDocuments().size() > 0) {
                 copySubFiles(doc.getDocuments(), subDoc);
             }
-            return subDoc;
-        }).forEachOrdered((subDoc) -> {
             document.subdocuments.add(subDoc);
-        });
+        }
     }
 }
