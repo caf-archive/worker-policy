@@ -39,8 +39,8 @@
         <td>Map&lt;String,&nbsp;Object&gt;</td>
         <td>
 			<p>Optional. Used to send additional worker-specific data to the worker.</p>
-			<p>The datatypes in which Object can be defined as and be recognised by the DocumentWorker handler is limited to String and Map. All Key-Value pairs must be of type String.</p>
-			<p>Any data within customData is extracted and placed into a DocumentWorkerTask object and passed to the worker. </p>
+			<p>The datatypes in which Object can be defined as and be recognised by the CompositeDocumentWorker handler is limited to String and Map. All Key-Value pairs must be of type String.</p>
+			<p>Any data within customData is extracted and placed into a DocumentWorkerDocumentTask object and passed to the worker. </p>
 			<p>How the data is extracted depends on how the information is stored in customData. (see examples below).</p>
 		</td>
     </tr>
