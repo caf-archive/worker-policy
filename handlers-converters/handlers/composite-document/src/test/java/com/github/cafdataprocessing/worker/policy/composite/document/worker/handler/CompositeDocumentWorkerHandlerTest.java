@@ -57,7 +57,7 @@ public class CompositeDocumentWorkerHandlerTest
     private CompositeDocumentWorkerHandler handler;
 
     @Before
-    public void SetupApplicationContext()
+    public void setupApplicationContext()
     {
         this.applicationContext = new CorePolicyApplicationContext();
 
@@ -97,7 +97,7 @@ public class CompositeDocumentWorkerHandlerTest
         String childInfo2HashValue = UUID.randomUUID().toString();
         document.getMetadata().put("CHILD_1_INFO_2", childInfo2HashValue);
 
-        if(generateChildren == true) {
+        if(generateChildren) {
             for (int i = 0; i < 3; i++) {
                 document.getDocuments().add(setupDocument(false));
             }
@@ -450,7 +450,7 @@ public class CompositeDocumentWorkerHandlerTest
     }
 
     @Test
-    public void testWorkerHandler_FieldFilter() throws IOException
+    public void testWorkerHandlerFieldFilter() throws IOException
     {
         Document document = setupDocument(false);
 
