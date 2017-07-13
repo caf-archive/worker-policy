@@ -26,7 +26,7 @@ import com.google.common.collect.Multimap;
 import com.hpe.caf.api.Codec;
 import com.hpe.caf.api.CodecException;
 import com.hpe.caf.api.worker.*;
-import com.hpe.caf.codec.JsonCodec;
+import com.hpe.caf.codec.JsonLzfCodec;
 import com.hpe.caf.util.ref.ReferencedData;
 
 import java.util.ArrayList;
@@ -58,7 +58,7 @@ public class ConvertHelper
                                                PolicyWorkerConverterInterface converter, String classifier)
             throws PolicyWorkerConverterException, CodecException, InvalidTaskException
     {
-        Codec codec = new JsonCodec();
+        Codec codec = new JsonLzfCodec();
         byte[] data;
         try {
             data = codec.serialise(result);
@@ -95,7 +95,7 @@ public class ConvertHelper
                                                PolicyWorkerConverterInterface converter, String classifier)
             throws PolicyWorkerConverterException, CodecException, InvalidTaskException
     {
-        Codec codec = new JsonCodec();
+        Codec codec = new JsonLzfCodec();
         byte[] data;
         try {
             data = codec.serialise(result);
@@ -132,7 +132,7 @@ public class ConvertHelper
                                                   TaskStatus taskStatus, PolicyWorkerConverterInterface converter, String classifier)
             throws PolicyWorkerConverterException, CodecException, InvalidTaskException
     {
-        Codec codec = new JsonCodec();
+        Codec codec = new JsonLzfCodec();
         //create context
         DocumentInterface documentToClassify = createDocument(documentReference.getReference());
 
@@ -154,7 +154,7 @@ public class ConvertHelper
                                                PolicyWorkerConverterInterface converter, String classifier)
             throws PolicyWorkerConverterException, CodecException, InvalidTaskException
     {
-        Codec codec = new JsonCodec();
+        Codec codec = new JsonLzfCodec();
 
         //create context
         DocumentInterface documentToClassify = createDocument(reference);
@@ -187,7 +187,7 @@ public class ConvertHelper
                                                Multimap<String, String> metadataForDoc, Multimap<String, ReferencedData> metadataReferencesForDoc)
             throws CodecException, InvalidTaskException, PolicyWorkerConverterException
     {
-        Codec codec = new JsonCodec();
+        Codec codec = new JsonLzfCodec();
         byte[] data;
         try {
             data = codec.serialise(bpResponse);
@@ -230,7 +230,7 @@ public class ConvertHelper
                                                PolicyWorkerConverterInterface converter, String classifier)
             throws PolicyWorkerConverterException, CodecException, InvalidTaskException
     {
-        Codec codec = new JsonCodec();
+        Codec codec = new JsonLzfCodec();
         byte[] data;
         try {
             data = codec.serialise(result);

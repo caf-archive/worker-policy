@@ -22,7 +22,7 @@
     <parent>
         <groupId>com.github.cafapi</groupId>
         <artifactId>caf-common</artifactId>
-        <version>1.11.0-218</version>
+        <version>1.12.0-SNAPSHOT</version>
     </parent>
 
     <groupId>com.github.cafdataprocessing</groupId>
@@ -96,7 +96,7 @@
         <module>worker-policy-type-registrant</module>
         <module>worker-policy-testing-handlers</module>
         <module>worker-policy-testing</module>
-        <module>worker-classification-container</module>
+        <!--<module>worker-classification-container</module>-->
         <module>worker-data-processing-container</module>
     </modules>
 
@@ -106,7 +106,7 @@
         <caf.worker.langdetect.container.name>cafinternal/prereleases:worker-languagedetection-2.1.0-27</caf.worker.langdetect.container.name>
         <caf.boilerplate.version>2.0.1-7</caf.boilerplate.version>
         <caf.corepolicy.version>1.0.0-4</caf.corepolicy.version>
-        <caf.worker-framework.version>1.9.0-260</caf.worker-framework.version>
+        <caf.worker-framework.version>2.0.0-PERF_JSON_LZF_CODEC-SNAPSHOT</caf.worker-framework.version>
     </properties>
 
     <dependencyManagement>
@@ -297,6 +297,7 @@
     </dependencyManagement>
     
     <dependencies>
+
         <dependency>
             <!--Use SLF4j as our logging api-->
             <groupId>org.slf4j</groupId>

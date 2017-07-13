@@ -19,7 +19,7 @@ import com.google.common.base.Strings;
 import com.hpe.caf.api.Codec;
 import com.hpe.caf.api.CodecException;
 import com.hpe.caf.api.worker.TaskMessage;
-import com.hpe.caf.codec.JsonCodec;
+import com.hpe.caf.codec.JsonLzfCodec;
 import com.hpe.caf.util.rabbitmq.*;
 import com.rabbitmq.client.Channel;
 
@@ -137,7 +137,7 @@ public class TestQueueConsumerImpl implements QueueConsumer
     {
         //check that response received
         Assert.assertNotNull(deliveredResult);
-        final Codec codec = new JsonCodec();
+        final Codec codec = new JsonLzfCodec();
         TaskMessage resultWrapper;
         try {
             resultWrapper = codec.deserialise(deliveredResult.getMessageData(), TaskMessage.class);

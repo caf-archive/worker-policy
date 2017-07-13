@@ -39,7 +39,7 @@ import com.hpe.caf.api.Codec;
 import com.hpe.caf.api.CodecException;
 import com.hpe.caf.api.ConfigurationException;
 import com.hpe.caf.api.worker.*;
-import com.hpe.caf.codec.JsonCodec;
+import com.hpe.caf.codec.JsonLzfCodec;
 import com.hpe.caf.util.rabbitmq.*;
 import com.hpe.caf.util.ref.ReferencedData;
 import com.hpe.caf.worker.datastore.fs.FileSystemDataStore;
@@ -276,7 +276,7 @@ public class PolicyWorkerIT extends BaseTestsHelper
             byte[] returnedTaskData = resultWrapper.getTaskData();
             checkTaskMessageReturned(resultWrapper, taskId);
             //check task data
-            Codec codec = new JsonCodec();
+            Codec codec = new JsonLzfCodec();
             
             TaskResponse taskResponse = codec.deserialise(returnedTaskData, TaskResponse.class);
             Assert.assertNotNull(taskResponse);
@@ -345,7 +345,7 @@ public class PolicyWorkerIT extends BaseTestsHelper
             byte[] returnedTaskData = resultWrapper.getTaskData();
             checkTaskMessageReturned(resultWrapper, taskId);
             //check task data
-            Codec codec = new JsonCodec();
+            Codec codec = new JsonLzfCodec();
             TaskResponse taskResponse = codec.deserialise(returnedTaskData, TaskResponse.class);
             Assert.assertNotNull(taskResponse);
             Collection<com.github.cafdataprocessing.worker.policy.shared.ClassifyDocumentResult> classifyResultCollection = taskResponse.getClassifiedDocuments();
@@ -479,8 +479,7 @@ public class PolicyWorkerIT extends BaseTestsHelper
             final TaskMessage resultWrapper = publishTaskAndAwaitThisMessagesResponse(pubEvents, consumerResult, classifyMessage);
 
             byte[] returnedTaskData = resultWrapper.getTaskData();
-            
-            Codec codec = new JsonCodec();
+            Codec codec = new JsonLzfCodec();
             checkTaskMessageReturned(resultWrapper, taskId);
             //check task data
             TaskResponse taskResponse = codec.deserialise(returnedTaskData, TaskResponse.class);
@@ -553,7 +552,7 @@ public class PolicyWorkerIT extends BaseTestsHelper
             byte[] returnedTaskData = resultWrapper.getTaskData();
             checkTaskMessageReturned(resultWrapper, taskId);
             //check task data
-            Codec codec = new JsonCodec();
+            Codec codec = new JsonLzfCodec();
             TaskResponse taskResponse = codec.deserialise(returnedTaskData, TaskResponse.class);
             Assert.assertNotNull(taskResponse);
             Collection<com.github.cafdataprocessing.worker.policy.shared.ClassifyDocumentResult> classifyResultCollection = taskResponse.getClassifiedDocuments();
@@ -602,8 +601,7 @@ public class PolicyWorkerIT extends BaseTestsHelper
 
         try {
             final TaskMessage resultWrapper = publishTaskAndAwaitThisMessagesResponse(pubEvents, consumerResult, executeMessage);
-            
-            Codec codec = new JsonCodec();
+            Codec codec = new JsonLzfCodec();
             byte[] returnedTaskData = resultWrapper.getTaskData();
             //check that task has status of result success
             checkTaskMessageReturned(resultWrapper, taskId);
@@ -744,8 +742,7 @@ public class PolicyWorkerIT extends BaseTestsHelper
 
         try {
             final TaskMessage resultWrapper = publishTaskAndAwaitThisMessagesResponse(pubEvents, consumerResult, classifyMessage);
-            
-            Codec codec = new JsonCodec();
+            Codec codec = new JsonLzfCodec();
            
             byte[] returnedTaskData = resultWrapper.getTaskData();
             checkTaskMessageReturned(resultWrapper, taskId);

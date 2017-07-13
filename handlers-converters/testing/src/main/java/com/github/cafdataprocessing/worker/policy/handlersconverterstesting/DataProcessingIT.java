@@ -39,7 +39,7 @@ import com.hpe.caf.api.worker.DataStore;
 import com.hpe.caf.api.worker.DataStoreException;
 import com.hpe.caf.api.worker.TaskMessage;
 import com.hpe.caf.api.worker.TaskStatus;
-import com.hpe.caf.codec.JsonCodec;
+import com.hpe.caf.codec.JsonLzfCodec;
 import com.hpe.caf.util.rabbitmq.Event;
 import com.hpe.caf.util.rabbitmq.QueueConsumer;
 import com.hpe.caf.util.rabbitmq.QueuePublisher;
@@ -422,7 +422,7 @@ public class DataProcessingIT extends BaseTestsHelper{
 
         try {
             final TaskMessage resultWrapper = publishTaskAndAwaitThisMessagesResponse(pubEvents, consumerResult, classifyMessage);
-            final Codec codec = new JsonCodec();
+            final Codec codec = new JsonLzfCodec();
 
             byte[] returnedTaskData = resultWrapper.getTaskData();
             //check that task has status of result success
@@ -496,7 +496,7 @@ public class DataProcessingIT extends BaseTestsHelper{
 
         try {
             final TaskMessage resultWrapper = publishTaskAndAwaitThisMessagesResponse(pubEvents, consumerResult, classifyMessage);
-            final Codec codec = new JsonCodec();
+            final Codec codec = new JsonLzfCodec();
 
             byte[] returnedTaskData = resultWrapper.getTaskData();
 
@@ -646,7 +646,7 @@ public class DataProcessingIT extends BaseTestsHelper{
 
         try {
             final TaskMessage resultWrapper = publishTaskAndAwaitThisMessagesResponse(pubEvents, consumerResult, classifyMessage);
-            final Codec codec = new JsonCodec();
+            final Codec codec = new JsonLzfCodec();
 
             byte[] returnedTaskData = resultWrapper.getTaskData();
 

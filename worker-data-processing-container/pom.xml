@@ -649,7 +649,7 @@
                         <!-- Images used by integration tests -->
 
                         <!-- Classification worker for the classification handler tests -->
-                        <image>
+                       <!-- <image>
                             <alias>classification-worker</alias>
                             <name>${container.classification.worker.name}</name>
                             <run>
@@ -658,7 +658,7 @@
                                     <CAF_RABBITMQ_PASSWORD>${rabbit.pass}</CAF_RABBITMQ_PASSWORD>
                                     <CAF_RABBITMQ_USERNAME>${rabbit.user}</CAF_RABBITMQ_USERNAME>
                                     <CAF_WORKER_DATASTORE_PATH>/srv/common/webdav</CAF_WORKER_DATASTORE_PATH>
-                                    <!--<CAF_WORKER_JAVA_OPTS>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005</CAF_WORKER_JAVA_OPTS>-->
+                                    &lt;!&ndash;<CAF_WORKER_JAVA_OPTS>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005</CAF_WORKER_JAVA_OPTS>&ndash;&gt;
                                     <CAF_WORKER_INPUT_QUEUE>classification-in</CAF_WORKER_INPUT_QUEUE>
                                     <CAF_WORKER_OUTPUT_QUEUE>${worker.queue.input}</CAF_WORKER_OUTPUT_QUEUE>
                                     <api.mode>direct</api.mode>
@@ -676,8 +676,8 @@
                                 </ports>
                                 <wait>
                                     <http>
-                                        <!-- note this check uses external port exposed on docker VM, it may be in bridged mode, or running
-                                        in its own machine, in which case, this can be the same as the container.run.tomcat.service.port -->
+                                        &lt;!&ndash; note this check uses external port exposed on docker VM, it may be in bridged mode, or running
+                                        in its own machine, in which case, this can be the same as the container.run.tomcat.service.port &ndash;&gt;
                                         <url>http://${docker.host.address}:${classification-worker-8081-serviceport}</url>
                                         <method>GET</method>
                                     </http>
@@ -694,13 +694,13 @@
                                     <link>corepolicydb-postgres</link>
                                 </links>
                                 <log>
-                                    <!-- enable logs from the container, they will show with policyadmin> prefix
-                                    and in the colour yellow -->
+                                    &lt;!&ndash; enable logs from the container, they will show with policyadmin> prefix
+                                    and in the colour yellow &ndash;&gt;
                                     <color>yellow</color>
                                     <enabled>true</enabled>
                                 </log>
                             </run>
-                        </image>
+                        </image>-->
 
                         <!-- Start BinaryHash Worker Image -->
                         <image>
@@ -780,7 +780,7 @@
             </plugin>
         </plugins>
     </build>
-    <reporting>
+   <!-- <reporting>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -801,5 +801,5 @@
                 </reportSets>
             </plugin>
         </plugins>
-    </reporting>
+    </reporting>-->
 </project>

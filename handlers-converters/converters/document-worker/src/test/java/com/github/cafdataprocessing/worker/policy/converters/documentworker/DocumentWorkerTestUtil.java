@@ -19,8 +19,9 @@ import com.github.cafdataprocessing.worker.policy.converter.qa.TestWorkerConvert
 import com.github.cafdataprocessing.worker.policy.data.reprocessing.tracking.TrackedDocument;
 import com.github.cafdataprocessing.worker.policy.shared.DocumentProcessingFieldType;
 import com.google.common.collect.Multimap;
+import com.hpe.caf.api.Codec;
 import com.hpe.caf.api.worker.DataStore;
-import com.hpe.caf.codec.JsonCodec;
+import com.hpe.caf.codec.JsonLzfCodec;
 import com.hpe.caf.util.ref.ReferencedData;
 import com.hpe.caf.worker.document.DocumentWorkerAction;
 import com.hpe.caf.worker.document.DocumentWorkerFieldValue;
@@ -120,7 +121,7 @@ public class DocumentWorkerTestUtil
 
     static TestWorkerConverterRuntimeImpl createDocumentWorkerConverterQARuntime(TrackedDocument trackedDocument, DataStore dataStore)
     {
-        JsonCodec jsonCodec = new JsonCodec();
+        Codec jsonCodec = new JsonLzfCodec();
         TestWorkerConverterRuntimeImpl runtime = new TestWorkerConverterRuntimeImpl(trackedDocument, jsonCodec, dataStore, null);
         return runtime;
     }
