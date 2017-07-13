@@ -104,8 +104,8 @@ public class CompositeDocumentWorkerHandler extends WorkerTaskResponsePolicyHand
             queueName,
             TaskStatus.NEW_TASK,
             task,
-            DocumentWorkerConstants.WORKER_NAME,
-            DocumentWorkerConstants.WORKER_API_VER);
+            DocumentWorkerConstants.DOCUMENT_TASK_NAME,
+            DocumentWorkerConstants.DOCUMENT_TASK_API_VER);
     }
 
     @Override
