@@ -21,6 +21,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.hpe.caf.util.ref.ReferencedData;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -56,7 +57,7 @@ public class Document implements DocumentInterface {
     /**
      * Sub documents
      */
-    private Collection<Document> documents;
+    private Collection<Document> documents = new ArrayList<>();
 
     @Override
     public Multimap<String, String> getMetadata() {

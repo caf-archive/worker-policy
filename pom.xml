@@ -102,6 +102,7 @@
 
     <properties>
         <caf.base-container.policy-elasticsearch>cafdataprocessing/policy-elasticsearch-container:1.0.0-2</caf.base-container.policy-elasticsearch>
+        <caf.document.worker.version>2.3.0-SNAPSHOT</caf.document.worker.version>
         <caf.worker.binaryhash.container.name>cafinternal/prereleases:worker-binaryhash-2.1.0-28</caf.worker.binaryhash.container.name>
         <caf.worker.langdetect.container.name>cafinternal/prereleases:worker-languagedetection-2.1.0-27</caf.worker.langdetect.container.name>
         <caf.boilerplate.version>2.0.1-7</caf.boilerplate.version>
@@ -149,7 +150,7 @@
             <dependency>
                 <groupId>com.github.cafdataprocessing</groupId>
                 <artifactId>worker-document-shared</artifactId>
-                <version>2.3.0-SNAPSHOT</version>
+                <version>${caf.document.worker.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafdataprocessing</groupId>

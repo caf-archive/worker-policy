@@ -174,6 +174,9 @@ public class TrackedDocument extends TrackedDocumentInternal implements Document
     {
         DocumentInterface document = trackedDocumentChanger.getInternalDocument().addSubDocument(reference);
         TrackedDocument trackedDocument = new TrackedDocument(document);
+        if(trackedSubDocuments==null){
+            trackedSubDocuments = new ArrayList<>();
+        }
         trackedSubDocuments.add(trackedDocument);
         return trackedDocument;
     }
