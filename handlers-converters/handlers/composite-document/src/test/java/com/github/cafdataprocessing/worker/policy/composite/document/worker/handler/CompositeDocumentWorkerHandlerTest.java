@@ -476,7 +476,7 @@ public class CompositeDocumentWorkerHandlerTest
         Assert.assertEquals("Check that worker response is NEW_TASK", TaskStatus.NEW_TASK, taskStatus);
         Assert.assertEquals("Expecting message type to be DocumentWorker", DocumentWorkerConstants.DOCUMENT_TASK_NAME, response.getMessageType());
         Assert.assertEquals("Expecting destination queue to be the same as that set in properties object", "DocWorkerNameInput", response.getQueueReference());
-        Assert.assertEquals("Check Api version matches", DocumentWorkerConstants.DOCUMENT_TASK_NAME, response.getApiVersion());
+        Assert.assertEquals("Check Api version matches", DocumentWorkerConstants.DOCUMENT_TASK_API_VER, response.getApiVersion());
 
         DocumentWorkerDocumentTask task = (DocumentWorkerDocumentTask) response.getData();
         Assert.assertNotNull(task);
