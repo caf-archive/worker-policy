@@ -458,7 +458,7 @@ public class CompositeDocumentWorkerHandlerTest
         testPolicy.id = 1L;
 
         ObjectMapper mapper = new ObjectMapper();
-        testPolicy.details = mapper.readTree("{ \"workerName\": \"DocWorkerName\", \"fields\": [\"CHILD_*_INFO_*\", \"internetmessageid\", \"conversationtopic\", \"TestWithNullValue\"]}");
+        testPolicy.details = mapper.readTree("{ \"workerName\": \"DocWorkerName\"}");
 
         Long testColSeqId = 1L;
 
@@ -484,9 +484,6 @@ public class CompositeDocumentWorkerHandlerTest
         Map<String, List<DocumentWorkerFieldValue>> taskFields = task.document.fields;
         Assert.assertNotNull(taskFields);
 
-        Assert.assertTrue(!taskFields.containsKey("metadataReferences"));
-        Assert.assertTrue(!taskFields.containsKey("caf-mail-conversation-index"));
-        Assert.assertTrue(!taskFields.containsKey("caf-mail-in-reply-to"));
         Assert.assertTrue(taskFields.containsKey("TestWithNullValue"));
         Assert.assertTrue(taskFields.containsKey("internetmessageid"));
         Assert.assertTrue(taskFields.containsKey("conversationtopic"));
@@ -513,7 +510,7 @@ public class CompositeDocumentWorkerHandlerTest
         String customValue = "Test";
 
         ObjectMapper mapper = new ObjectMapper();
-        testPolicy.details = mapper.readTree("{ \"workerName\": \"DocWorkerName\", \"customData\":{\"" + customKey1 + "\":\"" + customValue + "\",\"" + customKey2 + "\":\"" + customValue + "\"}, \"fields\": [\"DOC_REF_FIELD_NAME_1\", \"DOC_REF_FIELD_NAME_2\", \"TEST_WITH_NULL_VALUES\", \"DOC_REF_FIELD_DREDBNAME\", \"DOC_FIELD_NAME_1\"]}");
+        testPolicy.details = mapper.readTree("{ \"workerName\": \"DocWorkerName\", \"customData\":{\"" + customKey1 + "\":\"" + customValue + "\",\"" + customKey2 + "\":\"" + customValue + "\"}}");
 
         Multimap<String, ReferencedData> metadataReferences = ArrayListMultimap.create();
         metadataReferences.put("DOC_REF_FIELD_NAME_1", ReferencedData.getWrappedData("refValue1".getBytes()));

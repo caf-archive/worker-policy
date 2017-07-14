@@ -37,8 +37,6 @@ import com.hpe.caf.worker.document.DocumentWorkerFieldEncoding;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Predicate;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -275,7 +273,7 @@ public class CompositeDocumentWorkerHandler extends WorkerTaskResponsePolicyHand
         for (Document doc : documents) {
             DocumentWorkerDocument subDoc = new DocumentWorkerDocument();
             subDoc.reference = doc.getReference();
-            subDoc.fields = getFieldsData(null, doc);
+            subDoc.fields = getFieldsData(doc);
             if (doc.getDocuments().size() > 0) {
                 copySubFiles(doc.getDocuments(), subDoc);
             }
