@@ -32,7 +32,7 @@ public class CompositeDocumentWorkerConverter implements PolicyWorkerConverterIn
     @Override
     public void updateSupportedClassifierVersions(Multimap<String, Integer> multimap)
     {
-        multimap.put(DocumentWorkerConstants.WORKER_NAME, DocumentWorkerConstants.WORKER_API_VER);
+        multimap.put(DocumentWorkerConstants.DOCUMENT_TASK_NAME, DocumentWorkerConstants.DOCUMENT_TASK_API_VER);
     }
 
     @Override
