@@ -1,1 +1,1 @@
-com.github.cafdataprocessing.worker.policy.converters.documentworker.CompositeDocumentWorkerConverter
+com.github.cafdataprocessing.worker.policy.composite.document.converter.CompositeDocumentWorkerConverter
