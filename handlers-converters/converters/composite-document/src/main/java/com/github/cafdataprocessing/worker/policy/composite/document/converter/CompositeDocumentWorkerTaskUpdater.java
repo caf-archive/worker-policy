@@ -194,7 +194,7 @@ public final class CompositeDocumentWorkerTaskUpdater
         for (final DocumentInterface doc : document.getSubDocuments()) {
             if (doc.getReference().equals(reference)) {
                 final List<DocumentWorkerChangeLogEntry> changeEntryList = createEntryList(changeLog);
-                updateDocument(document, changeEntryList);
+                updateDocument(doc, changeEntryList);
             }
         }
     }
