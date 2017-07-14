@@ -88,7 +88,7 @@ public class CompositeDocumentWorkerHandler extends WorkerTaskResponsePolicyHand
         }
 
         //  Gather fields for Document Worker task.
-        task.document.fields = getFieldsData(policyDef.fields, document);
+        task.document.fields = getFieldsData(document);
 
         //  Gather sub-files for document worker document to be provided on task.
         copySubFiles(document.getDocuments(), task.document);
@@ -133,7 +133,7 @@ public class CompositeDocumentWorkerHandler extends WorkerTaskResponsePolicyHand
         return null;
     }
 
-    private Map<String, List<DocumentWorkerFieldValue>> getFieldsData(final Set<String> policyDefFields, final Document document)
+    private Map<String, List<DocumentWorkerFieldValue>> getFieldsData(final Document document)
     {
         final Map<String, List<DocumentWorkerFieldValue>> fieldsMap = new HashMap<>();
 
@@ -141,54 +141,18 @@ public class CompositeDocumentWorkerHandler extends WorkerTaskResponsePolicyHand
         final com.github.cafdataprocessing.worker.policy.shared.Document taskDataDocumentToClassify = workerResponseHolder.getTaskData().getDocument();
 
         /**
-         * Add metadata fields to Document Worker Task fields. If 'fields' is specified in the policy definition then only add those
-         * fields to the 'fieldsMap' otherwise add all fields. This method is looping through a Metadata map of String to String, and a
+         * Add metadata fields to Document Worker Task fields. This method is looping through a Metadata map of String to String, and a
          * Metadata map of String to ReferenceData which is used for binary data and storage references.
          */
-        if (policyDefFields == null || policyDefFields.isEmpty()) {
-            document.getMetadata().entries().stream()
-                .forEach(metadata -> addToWorkerTaskFields(fieldsMap, metadata.getKey(), createWorkerData(metadata.getValue())));
-            if (taskDataDocumentToClassify != null) {
-                taskDataDocumentToClassify.getMetadataReferences().entries().stream()
-                    .forEach(metadataReference -> addToWorkerTaskFields(fieldsMap, metadataReference.getKey(),
-                                                                        createWorkerData(metadataReference.getValue())));
-            }
-            return fieldsMap;
+        document.getMetadata().entries().stream()
+            .forEach(metadata -> addToWorkerTaskFields(fieldsMap, metadata.getKey(), createWorkerData(metadata.getValue())));
+        if (taskDataDocumentToClassify != null) {
+            taskDataDocumentToClassify.getMetadataReferences().entries().stream()
+                .forEach(metadataReference -> addToWorkerTaskFields(fieldsMap, metadataReference.getKey(),
+                                                                    createWorkerData(metadataReference.getValue())));
         }
 
-        for (final String fieldName : policyDefFields) {
-            // Get the predicate for metadata key matching from the filter field name
-            final Predicate<String> doesFieldSpecMatch = getKeyToFilterFieldNameMatchPredicate(fieldName);
-            // If the filter field name matches with the metadata key add the metadata entry to the worker task fields
-            document.getMetadata().entries().stream()
-                .filter(metadata -> doesFieldSpecMatch.test(metadata.getKey()))
-                .forEach(metadata -> addToWorkerTaskFields(fieldsMap, metadata.getKey(), createWorkerData(metadata.getValue())));
-            if (taskDataDocumentToClassify != null) {
-                taskDataDocumentToClassify.getMetadataReferences().entries().stream()
-                    .filter(metadataRef -> doesFieldSpecMatch.test(metadataRef.getKey()))
-                    .forEach(metadataReference -> addToWorkerTaskFields(fieldsMap, metadataReference.getKey(),
-                                                                        createWorkerData(metadataReference.getValue())));
-            }
-        }
         return fieldsMap;
-    }
-
-    private Predicate<String> getKeyToFilterFieldNameMatchPredicate(final String filterFieldName)
-    {
-        /**
-         * If the filter field name contains an asterisk for wildcard matching transform it for regex matching and return the predicate
-         * for matching a key against it. Else return the predicate for matching a key against the filter field name.
-         */
-        if (filterFieldName.contains("*")) {
-            final String[] splitFieldFieldName = filterFieldName.split("\\*", -1);
-            for (int i = 0; i < splitFieldFieldName.length; i++) {
-                splitFieldFieldName[i] = Pattern.quote(splitFieldFieldName[i].toUpperCase());
-            }
-            final String finalRegEx = String.join(".*", splitFieldFieldName);
-            return key -> key.toUpperCase().matches(finalRegEx);
-        } else {
-            return key -> key.equalsIgnoreCase(filterFieldName);
-        }
     }
 
     private static void addToWorkerTaskFields(final Map<String, List<DocumentWorkerFieldValue>> fieldsMap, final String name,
@@ -305,7 +269,7 @@ public class CompositeDocumentWorkerHandler extends WorkerTaskResponsePolicyHand
 
     private void copySubFiles(final Collection<Document> documents, final DocumentWorkerDocument document)
     {
-        if(document.subdocuments == null){
+        if (document.subdocuments == null) {
             document.subdocuments = new ArrayList();
         }
         for (Document doc : documents) {

@@ -25,9 +25,6 @@ public class CompositeDocumentPolicyDefinition extends PolicyQueueDefinition
 
     public String workerName;
 
-    /*  Optional. Fields that will be evaluated. If null all fields will be evaluated.*/
-    public Set<String> fields = new HashSet<>();
-
     /*  Optional. List of change log entries that represent the changes a worker has requested be performed to the document */
     public List<DocumentWorkerChangeLogEntry> changeLog;
 
