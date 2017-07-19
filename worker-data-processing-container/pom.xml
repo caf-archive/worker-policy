@@ -33,7 +33,7 @@
     <properties>
         <container.classification.worker.name>cafinternal/prereleases:worker-classification-${project.version}</container.classification.worker.name>
         <container.worker.alias>worker-data-processing</container.worker.alias>
-        <container.worker.name>${dockerDataProcessingOrg}worker-data-processing${dockerProjectVersion}</container.worker.name>   
+        <container.worker.name>${dockerCafDataProcessingOrg}worker-data-processing${dockerProjectVersion}</container.worker.name>   
 
         <container.test-configs.dir>/config</container.test-configs.dir>
 
