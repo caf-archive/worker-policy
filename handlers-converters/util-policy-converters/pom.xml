@@ -24,7 +24,7 @@
     <parent>
         <groupId>com.github.cafdataprocessing</groupId>
         <artifactId>worker-policy-handlers-converters</artifactId>
-        <version>1.2.0-SNAPSHOT</version>
+        <version>1.2.0-43</version>
     </parent>
 
     <artifactId>util-policy-converters</artifactId>
