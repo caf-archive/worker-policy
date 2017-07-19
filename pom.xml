@@ -109,7 +109,7 @@
         <caf.corepolicy.version>1.0.0-4</caf.corepolicy.version>
         <caf.worker-framework.version>1.9.0-260</caf.worker-framework.version>
         <dockerHubOrganization>cafdataprocessing</dockerHubOrganization>
-        <dockerDataProcessingOrg>${dockerImagePrefix}${dockerHubOrganization}${dockerOrgSeperator}</dockerDataProcessingOrg>
+        <dockerCafDataProcessingOrg>${dockerImagePrefix}${dockerHubOrganization}${dockerOrgSeperator}</dockerCafDataProcessingOrg>
         <dockerProjectVersion>${dockerVersionSeperator}${project.version}</dockerProjectVersion>
     </properties>
 
