@@ -30,7 +30,7 @@
     <properties>
         <fileSet.outputDirectory>Copied</fileSet.outputDirectory>
 
-        <container.worker.name>cafinternal/prereleases:worker-classification-${project.version}</container.worker.name>
+        <container.worker.name>${dockerCafInternalOrg}worker-classification${dockerProjectVersion}</container.worker.name>
         <container.test-configs.dir>/configs</container.test-configs.dir>
 
         <engine.environmentcache.location>/var/corepolicy/envcache</engine.environmentcache.location>
