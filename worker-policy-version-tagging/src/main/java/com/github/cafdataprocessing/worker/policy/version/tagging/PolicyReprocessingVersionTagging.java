@@ -73,5 +73,27 @@ public final class PolicyReprocessingVersionTagging {
             return;
         }
         metadata.put(processingVersionFieldName, workerProcessingInfo.getWorkerVersion());
+        //add this to all sub documents
+        Collection<DocumentInterface> subDocuments = document.getSubDocuments();
+        if(subDocuments==null){
+            return;
+        }
+        for(DocumentInterface subDocument: subDocuments){
+            addProcessingWorkerVersionToSubdocument(subDocument, processingVersionFieldName,
+                    workerProcessingInfo.getWorkerVersion());
+        }
+    }
+
+    private static void addProcessingWorkerVersionToSubdocument(DocumentInterface subDocument, String fieldName,
+                                                                 String fieldValue){
+        subDocument.getMetadata().put(fieldName, fieldValue);
+        //add the field to any children of this subDocument
+        Collection<DocumentInterface> subDocumentChildren = subDocument.getSubDocuments();
+        if(subDocumentChildren==null){
+            return;
+        }
+        for(DocumentInterface subDocumentChild: subDocumentChildren){
+            addProcessingWorkerVersionToSubdocument(subDocumentChild, fieldName, fieldValue);
+        }
     }
 }
