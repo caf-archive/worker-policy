@@ -108,6 +108,9 @@
         <caf.boilerplate.version>2.0.1-7</caf.boilerplate.version>
         <caf.corepolicy.version>1.0.0-4</caf.corepolicy.version>
         <caf.worker-framework.version>1.9.0-260</caf.worker-framework.version>
+        <dockerHubOrganization>cafdataprocessing</dockerHubOrganization>
+        <dockerDataProcessingOrg>${dockerImagePrefix}${dockerHubOrganization}${dockerOrgSeperator}</dockerDataProcessingOrg>
+        <dockerProjectVersion>${dockerVersionSeperator}${project.version}</dockerProjectVersion>
     </properties>
 
     <dependencyManagement>
