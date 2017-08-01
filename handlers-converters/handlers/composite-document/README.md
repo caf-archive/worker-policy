@@ -58,10 +58,6 @@
 }
 </pre>
 
-<br></br>
-
-<br></br>
-
 #### Sending optional data to the queue specified in configuration
 
 
