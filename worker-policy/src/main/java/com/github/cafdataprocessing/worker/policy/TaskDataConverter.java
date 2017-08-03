@@ -273,7 +273,7 @@ public class TaskDataConverter {
 
     /**
      * Creates a context describing the policy worker state for this task data so that the task may be rebuilt for processing to continue
-     * when a message is returned toa  policy worker from an external destination.
+     * when a message is returned to a  policy worker from an external destination.
      * @param classifierToSendTo The external destination that a task is to be sent to.
      * @param classifierVersion The version of the external destination.
      * @param taskData TaskData representing current state of policy worker processing.
