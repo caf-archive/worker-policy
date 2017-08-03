@@ -36,6 +36,11 @@
         </dependency>
         <dependency>
             <groupId>com.github.cafdataprocessing</groupId>
+            <artifactId>worker-policy</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.cafdataprocessing</groupId>
             <artifactId>worker-policy-converters-shared</artifactId>
             <scope>provided</scope>
         </dependency>

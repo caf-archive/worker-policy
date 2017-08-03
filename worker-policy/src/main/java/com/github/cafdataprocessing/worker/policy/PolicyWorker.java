@@ -57,7 +57,7 @@ public class PolicyWorker extends AbstractWorker<TaskData, Object> {
         this.data = data;
 
         this.executeTaskData = new ExecuteTaskData(applicationContext, this, new DataStoreSource(dataStore, codec),
-                workflowCache, apiProvider);
+                workflowCache, apiProvider, codec);
         this.taskStatus = taskStatus;
         this.context = context;
     }

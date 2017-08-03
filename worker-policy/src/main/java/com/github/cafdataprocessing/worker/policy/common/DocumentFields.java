@@ -214,6 +214,22 @@ public class DocumentFields {
         return temporaryData;
     }
 
+    /**
+     * Returns all the fields added to the Document to tracking working progress through Workflow/Collection Sequence execution.
+     * @param document The Document to return temporary working data from.
+     * @return The temporary data on the Document.
+     */
+    public static Multimap<String, String> getTemporaryWorkingData(Document document){
+        Multimap<String, String> temporaryData = ArrayListMultimap.create();
+        Multimap<String, String> docData = document.getMetadata();
+
+        getListOfKnownTemporaryData(docData).stream().filter(propName -> docData.containsKey(propName)).forEach(propName -> {
+            temporaryData.putAll(propName, docData.get(propName));
+        });
+
+        return temporaryData;
+    }
+
     public static void reapplyTemporaryWorkingData(com.github.cafdataprocessing.corepolicy.common.Document document,
                                                    Multimap<String, String> temporaryData )
     {
