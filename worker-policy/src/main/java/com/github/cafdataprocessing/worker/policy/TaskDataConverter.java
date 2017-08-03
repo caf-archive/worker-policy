@@ -184,7 +184,10 @@ public class TaskDataConverter {
         //context may be null for certain workers e.g. a sub-document extracting worker may not set context on the
         //messages generated for sub-documents
         if (context != null) {
-            return converter.convertPolicyWorkerContext(context, workerTask.getData(), codec);
+            if(converter!=null) {
+                return converter.convertPolicyWorkerContext(context, workerTask.getData(), codec);
+            }
+            return codec.deserialise(context, TaskData.class);
         }
 
         // Check that the task status is available
