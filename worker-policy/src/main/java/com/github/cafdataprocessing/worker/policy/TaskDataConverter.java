@@ -42,7 +42,7 @@ import com.github.cafdataprocessing.worker.policy.version.tagging.WorkerProcessi
 import java.util.Optional;
 
 /**
- * Handles converting a worker-policy task data from a task returned by a different type of worker.
+ * Functionality around converting a worker-policy task data from a task returned by a different type of worker.
  */
 public class TaskDataConverter {
     private final Map<String, PolicyWorkerConverterInterface> workerInputConverters = new HashMap<>();
@@ -88,7 +88,7 @@ public class TaskDataConverter {
         // Get the initial task data from the context (or the converter)
         final TaskData taskData = getTaskData(converter, codec, dataStore, workerTask);
 
-        // Throw an error if the task data could not br retrieved
+        // Throw an error if the task data could not be retrieved
         if (taskData == null) {
             throw new InvalidTaskException("Context not present, could not be deserialised, or could not be replaced");
         }
@@ -179,11 +179,12 @@ public class TaskDataConverter {
     )
         throws InvalidTaskException, CodecException
     {
-        // Just deserialise the context if it is available
+        // Deserialise the context if it is available
         final byte[] context = workerTask.getContext();
-
+        //context may be null for certain workers e.g. a sub-document extracting worker may not set context on the
+        //messages generated for sub-documents
         if (context != null) {
-            return codec.deserialise(context, TaskData.class);
+            return converter.convertPolicyWorkerContext(context, workerTask.getData(), codec);
         }
 
         // Check that the task status is available
@@ -198,7 +199,7 @@ public class TaskDataConverter {
             case NEW_TASK:
             case RESULT_SUCCESS:
             case RESULT_FAILURE:
-                // Base runtime used in sub document converter method, providing a codec to deserialize the response
+                //Base runtime used in sub document converter method, providing a codec to deserialize the response
                 PolicyWorkerConverterRuntimeBase baseRuntime = new PolicyWorkerConverterRuntimeBaseImpl(codec, dataStore, workerTask);
 
                 try {
@@ -268,8 +269,27 @@ public class TaskDataConverter {
     }
 
     /**
+     * Creates a context describing the policy worker state for this task data so that the task may be rebuilt for processing to continue
+     * when a message is returned toa  policy worker from an external destination.
+     * @param classifierToSendTo The external destination that a task is to be sent to.
+     * @param classifierVersion The version of the external destination.
+     * @param taskData TaskData representing current state of policy worker processing.
+     * @param codec Codec to use in serializing context.
+     * @return Generated context to pass for this policy worker.
+     */
+    public byte[] generatePolicyWorkerContext(final String classifierToSendTo, final int classifierVersion,
+                                              final TaskData taskData, final Codec codec) throws CodecException {
+        PolicyWorkerConverterInterface converter = workerInputConverters.get(classifierToSendTo);
+        if(converter==null){
+            //there may not be a converter matching the handler used to build message e.g. GenericQueueHandler which is only
+            //concerned with sending a message to a queue that will not be returned to a policy worker.
+            return codec.serialise(taskData);
+        }
+        return converter.generatePolicyWorkerContext(taskData, codec);
+    }
+
+    /**
      * Obtain the name of the worker, that performed the operation.
-     *
      * @param workerTaskData
      * @return
      */
@@ -307,6 +327,17 @@ public class TaskDataConverter {
         return codecExceptionVariablesInfo.toString();
     }
 
+    /**
+     * Updates to the object based on the task data and classifier information should occur here. e.g. A particular converter
+     * that requires additional task data information to be passed may record this in a special field on the object via
+     * the mergeTaskDataOntoInfoToBeSent method of PolicyWorkerConverterRequestInterface which could be called here.
+     * The Object type is passed as the specific type will vary based on the classifier information provided, which should
+     * be used by the update logic called inside this method.
+     * @param classifierToSendTo The classifier identity that data will be sent to.
+     * @param classifierVersion The version of the point that data will be sent to.
+     * @param object Object data to update.
+     * @param taskData TaskData to pull information from for the update.
+     */
     public void updateObjectWithTaskData(String classifierToSendTo, int classifierVersion, Object object, TaskData taskData)
     {
         PolicyWorkerConverterInterface converter = null;

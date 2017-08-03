@@ -135,7 +135,7 @@ public class PolicyWorkerFactory implements WorkerFactory {
                     throw new InvalidTaskException("Policy Worker Message Version not supported: " + version);
                 }
             } else {
-                // The Converter itself will only be called if the TaskStatus is RESULT_SUCCESS or RESULT_FAILURE.
+                // The Converter's conversion logic will only be called if the TaskStatus is NEW_TASK, RESULT_SUCCESS or RESULT_FAILURE.
                 // Otherwise the task is still returned from the context, and the error information is added to it.
                 final PolicyWorkerConverterInterface converter = taskDataConverter.getConverter(classifier, version);
                 task = TaskDataConverter.convert(converter, codec, dataStore, workerTask);

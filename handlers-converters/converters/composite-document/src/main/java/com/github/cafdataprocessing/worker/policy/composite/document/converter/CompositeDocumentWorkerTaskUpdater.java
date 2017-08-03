@@ -19,7 +19,6 @@ import com.github.cafdataprocessing.worker.policy.converters.ConverterUtils;
 import com.github.cafdataprocessing.worker.policy.shared.DocumentInterface;
 import com.github.cafdataprocessing.worker.policy.shared.PolicyWorkerConstants;
 import com.google.common.collect.Multimap;
-import com.hpe.caf.util.ref.ReferencedData;
 import com.hpe.caf.worker.document.DocumentWorkerChange;
 import com.hpe.caf.worker.document.DocumentWorkerChange.InsertSubdocumentParams;
 import com.hpe.caf.worker.document.DocumentWorkerChange.RemoveSubdocumentParams;
@@ -28,14 +27,11 @@ import com.hpe.caf.worker.document.DocumentWorkerChange.UpdateSubdocumentParams;
 import com.hpe.caf.worker.document.DocumentWorkerChangeLogEntry;
 import com.hpe.caf.worker.document.DocumentWorkerDocument;
 import com.hpe.caf.worker.document.DocumentWorkerFailure;
-import com.hpe.caf.worker.document.DocumentWorkerFieldEncoding;
-import static com.hpe.caf.worker.document.DocumentWorkerFieldEncoding.utf8;
 import com.hpe.caf.worker.document.DocumentWorkerFieldValue;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.apache.commons.codec.binary.Base64;
 
 public final class CompositeDocumentWorkerTaskUpdater
 {
@@ -65,7 +61,7 @@ public final class CompositeDocumentWorkerTaskUpdater
 
         final Map<String, List<DocumentWorkerFieldValue>> addFieldsParam = change.addFields;
         if (addFieldsParam != null) {
-            addFields(addFieldsParam, document);
+            DocumentConversionUtils.addFields(addFieldsParam, document);
         }
 
         final Map<String, List<DocumentWorkerFieldValue>> setFieldsParam = change.setFields;
@@ -89,14 +85,14 @@ public final class CompositeDocumentWorkerTaskUpdater
 
         final DocumentWorkerDocument addSubdocumentParam = change.addSubdocument;
         if (addSubdocumentParam != null) {
-            addSubDocument(addSubdocumentParam, document);
+            DocumentConversionUtils.addSubDocument(addSubdocumentParam, document);
         }
 
         final InsertSubdocumentParams insertSubdocumentParams = change.insertSubdocument;
         if (insertSubdocumentParams != null) {
             // The ability to insert at an index is not supported in a DocumentInterface object as subfiles are held
             // in an unordered Collection, the document is simply added to the Collection.
-            addSubDocument(insertSubdocumentParams.subdocument, document);
+            DocumentConversionUtils.addSubDocument(insertSubdocumentParams.subdocument, document);
         }
 
         final UpdateSubdocumentParams updateSubdocumentParams = change.updateSubdocument;
@@ -115,53 +111,12 @@ public final class CompositeDocumentWorkerTaskUpdater
         document.setReference(reference);
     }
 
-    private static void addFields(final Map<String, List<DocumentWorkerFieldValue>> fieldChanges, final DocumentInterface document)
-    {
-        for (Map.Entry<String, List<DocumentWorkerFieldValue>> fieldEntryChange : fieldChanges.entrySet()) {
-            for (DocumentWorkerFieldValue fieldValue : fieldEntryChange.getValue()) {
-                if (fieldValue != null) {
-                    final String data = fieldValue.data;
-                    if (data != null) {
-                        DocumentWorkerFieldEncoding encoding = fieldValue.encoding;
 
-                        if (encoding == null) {
-                            encoding = utf8;
-                        }
-
-                        switch (encoding) {
-                            case utf8: {
-                                ConverterUtils.addMetadataToDocument(fieldEntryChange.getKey(), data, document);
-                            }
-                            break;
-
-                            case storage_ref: {
-                                ConverterUtils.addMetadataReferenceToDocument(
-                                    fieldEntryChange.getKey(), ReferencedData.getReferencedData(data), document);
-                            }
-                            break;
-
-                            case base64: {
-                                byte[] databyte = Base64.decodeBase64(data);
-                                ConverterUtils.addMetadataReferenceToDocument(
-                                    fieldEntryChange.getKey(), ReferencedData.getWrappedData(databyte), document);
-                            }
-                            break;
-
-                            default: {
-                                throw new RuntimeException("Encoding type not recognised, encoding should be of type base64, utf8 or storage_ref.");
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
 
     private static void setFields(final Map<String, List<DocumentWorkerFieldValue>> fieldChanges, final DocumentInterface document)
     {
         removeFields(new ArrayList(fieldChanges.keySet()), document);
-
-        addFields(fieldChanges, document);
+        DocumentConversionUtils.addFields(fieldChanges, document);
     }
 
     private static void removeFields(final List<String> fieldnames, final DocumentInterface document)
@@ -169,17 +124,6 @@ public final class CompositeDocumentWorkerTaskUpdater
         for (final String fieldname : fieldnames) {
             ConverterUtils.removeMetadataFromDocument(fieldname, document);
             ConverterUtils.removeMetadataReferenceFromDocument(fieldname, document);
-        }
-    }
-
-    private static void addSubDocument(final DocumentWorkerDocument documentWorkerDocument, final DocumentInterface document)
-    {
-        final DocumentInterface subDoc = document.addSubDocument(documentWorkerDocument.reference);
-        addFields(documentWorkerDocument.fields, subDoc);
-        if (documentWorkerDocument.subdocuments != null) {
-            documentWorkerDocument.subdocuments.forEach((doc) -> {
-                addSubDocument(doc, document);
-            });
         }
     }
 
