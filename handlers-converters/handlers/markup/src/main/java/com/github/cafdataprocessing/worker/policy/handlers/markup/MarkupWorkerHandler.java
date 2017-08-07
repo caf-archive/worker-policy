@@ -37,6 +37,7 @@ import com.hpe.caf.worker.markup.MarkupWorkerTask;
 
 import java.io.IOException;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -115,7 +116,7 @@ public class MarkupWorkerHandler extends WorkerTaskResponsePolicyHandler
         //  Add metadata fields to source data (filter to list provided on policy definition if required)
         if (policyDefFields == null || policyDefFields.isEmpty()) {
             document.getMetadata().entries().stream().forEach((metadata) -> {
-                sourceData.put(metadata.getKey(), ReferencedData.getWrappedData(metadata.getValue().getBytes()));
+                sourceData.put(metadata.getKey(), ReferencedData.getWrappedData(metadata.getValue().getBytes(StandardCharsets.UTF_8)));
             });
         } else {
             for (final String filterFieldName : policyDefFields) {
@@ -124,7 +125,7 @@ public class MarkupWorkerHandler extends WorkerTaskResponsePolicyHandler
                 for (Map.Entry<String, String> metadata : document.getMetadata().entries()) {
                     // If the filter field name matches with the metadata key add the metadata entry to the sourceData
                     if (doesFieldSpecMatch.test(metadata.getKey())) {
-                        sourceData.put(metadata.getKey(), ReferencedData.getWrappedData(metadata.getValue().getBytes()));
+                        sourceData.put(metadata.getKey(), ReferencedData.getWrappedData(metadata.getValue().getBytes(StandardCharsets.UTF_8)));
                     }
                 }
             }

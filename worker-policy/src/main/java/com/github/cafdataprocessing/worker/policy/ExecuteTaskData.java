@@ -34,6 +34,7 @@ import com.github.cafdataprocessing.worker.policy.shared.Document;
 import com.github.cafdataprocessing.worker.policy.shared.PolicyWorkerConstants;
 import com.github.cafdataprocessing.worker.policy.shared.TaskData;
 import com.github.cafdataprocessing.worker.policy.data.reprocessing.tracking.TrackedDocument;
+import com.hpe.caf.api.Codec;
 import com.hpe.caf.api.CodecException;
 import com.hpe.caf.api.worker.*;
 import com.hpe.caf.codec.JsonLzfCodec;
@@ -55,6 +56,7 @@ public class ExecuteTaskData {
     private final LoadingCache<Long, SequenceWorkflow> workflowCache;
     private static Logger logger = LoggerFactory.getLogger(ExecuteTaskData.class);
     private final ClassifyDocumentApi classifyDocumentApi;
+    private final Codec codec;
     private final PolicyApi policyApi;
     private final PolicyWorker policyWorker;
     private final DocumentConverter documentConverter;
@@ -64,13 +66,15 @@ public class ExecuteTaskData {
 
     public ExecuteTaskData(CorePolicyApplicationContext corePolicyApplicationContext, PolicyWorker worker,
                            DataStoreSource dataStoreSource,
-                           LoadingCache<Long, SequenceWorkflow> workflowCache, ApiProvider apiProvider) {
+                           LoadingCache<Long, SequenceWorkflow> workflowCache, ApiProvider apiProvider,
+                           Codec codec) {
         this.corePolicyApplicationContext = corePolicyApplicationContext;
         this.dataStoreSource = dataStoreSource;
         this.workflowCache = workflowCache;
         this.classifyDocumentApi = apiProvider.getClassifyDocumentApi();
         this.policyApi = apiProvider.getPolicyApi();
         this.policyWorker = Objects.requireNonNull(worker);
+        this.codec = codec;
         this.documentConverter = new DocumentConverter();
         this.classifyDocumentResultConverter = new ClassifyDocumentResultConverter();
     }
@@ -228,17 +232,28 @@ public class ExecuteTaskData {
 
     private void createChainedWorkerResponse(TaskData taskData, WorkerResponseHolder workerResponseHolder) {
 
-        // get the actual WorkerHandlerResponse for a complex chained policy reponse, and use it to create the
+        // get the actual WorkerHandlerResponse for a complex chained policy response, and use it to create the
         // full WorkerResponse object.
         WorkerTaskResponsePolicyHandler.WorkerHandlerResponse workerHandlerResponse = workerResponseHolder.getChainWorkerResponse();
         if (workerHandlerResponse == null) {
             return;
         }
 
-        this.policyWorker.getTaskDataConverter().updateObjectWithTaskData(workerHandlerResponse.getMessageType(),
-                workerHandlerResponse.getApiVersion(), workerHandlerResponse.getData(), taskData);
+		// performance testing hack override the codec!
+		JsonLzfCodec policyCodec = new JsonLzfCodec();
 
-        JsonLzfCodec policyCodec = new JsonLzfCodec();
+        //perform any updates required on the data that is to be sent in the response by the appropriate converter
+        TaskDataConverter taskDataConverter = this.policyWorker.getTaskDataConverter();
+        taskDataConverter.updateObjectWithTaskData(workerHandlerResponse.getMessageType(),
+                workerHandlerResponse.getApiVersion(), workerHandlerResponse.getData(), taskData);
+        byte[] policyWorkerContext;
+        try {
+            policyWorkerContext = taskDataConverter.generatePolicyWorkerContext(workerHandlerResponse.getMessageType(),
+                    workerHandlerResponse.getApiVersion(), taskData, policyCodec);
+        }
+        catch (CodecException e) {
+            throw new BackEndRequestFailedCpeException(e);
+        }
 
         WorkerResponse workerResponse;
         try {
@@ -247,7 +262,7 @@ public class ExecuteTaskData {
                     policyCodec.serialise(workerHandlerResponse.getData()),
                     workerHandlerResponse.getMessageType(),
                     workerHandlerResponse.getApiVersion(),
-                    policyCodec.serialise(taskData)
+                    policyWorkerContext
             );
         } catch (CodecException e) {
             throw new BackEndRequestFailedCpeException(e);

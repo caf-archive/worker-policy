@@ -65,7 +65,8 @@
                     "NONE",
                     "REMOVE_WHITESPACE",
                     "NAME_ONLY",
-                    "REMOVE_WHITESPACE_AND_LINKS"
+                    "REMOVE_WHITESPACE_AND_LINKS",
+                    "NORMALIZE_PRIORITY"
                   ]
                 }
               }

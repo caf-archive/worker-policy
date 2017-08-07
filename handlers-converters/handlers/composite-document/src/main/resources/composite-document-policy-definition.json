@@ -1,0 +1,23 @@
+{
+    "title": "Composite Document Policy Type",
+    "description": "Allows the Policy Worker to integrate with workers which meet the Document Worker contract.  Document Workers can add extra fields to a document, and can also update or remove fields.",
+    "type": "object",
+    "properties": {
+        "workerName": {
+            "description": "The name of the worker. Some configuration details, such as the default queue names, will be looked up based on this name.",
+            "type": "string"
+        },
+        "queueName": {
+            "description": "Optional. Typically the target queue name is provided via configuration. This field can be used as a means to override the queue name specified in the configuration.",
+            "type": "string"
+        },
+        "diagnosticsQueueName": {
+            "description": "Optional. Allows a second 'diagnostic' queue to be specified for the worker. This will be used if the worker fails.",
+            "type": "string"
+        }
+    },
+    "customData": {
+        "description": "Optional. Used to send additional worker-specific data to the worker.",
+        "type": "object"
+    }
+}

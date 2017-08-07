@@ -18,6 +18,7 @@ package com.github.cafdataprocessing.worker.policy.shared;
 import com.google.common.collect.Multimap;
 import com.github.cafdataprocessing.entity.fields.DocumentProcessingRecord;
 import com.hpe.caf.util.ref.ReferencedData;
+import java.util.Collection;
 
 /**
  * Interface to be used when accessing the policy worker shared document information.
@@ -29,7 +30,9 @@ public interface DocumentInterface {
     public Multimap<String, String> getMetadata();
  
     public Multimap<String, ReferencedData> getMetadataReferences();
-
+    public Collection<DocumentInterface> getSubDocuments();
+    public void removeSubdocument(String reference);
+    public DocumentInterface addSubDocument(String reference);
     public String getReference();
     public void setReference(String reference);
     

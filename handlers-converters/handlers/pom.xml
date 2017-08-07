@@ -22,7 +22,7 @@
     <parent>
         <groupId>com.github.cafdataprocessing</groupId>
         <artifactId>worker-policy-handlers-converters</artifactId>
-        <version>1.2.0-SNAPSHOT</version>
+        <version>1.4.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>worker-policy-handlers</artifactId>
@@ -33,6 +33,7 @@
         <module>boilerplate</module>
         <module>classification-handler-base</module>
         <module>document-worker</module>
+        <module>composite-document</module>
         <module>elasticsearch-classification</module>
         <module>field-mapping</module>
         <module>generic-queue</module>

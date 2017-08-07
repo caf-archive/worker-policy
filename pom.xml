@@ -22,12 +22,12 @@
     <parent>
         <groupId>com.github.cafapi</groupId>
         <artifactId>caf-common</artifactId>
-        <version>1.12.0-SNAPSHOT</version>
+        <version>1.12.0-232</version>
     </parent>
 
     <groupId>com.github.cafdataprocessing</groupId>
     <artifactId>worker-policy-aggregator</artifactId>
-    <version>1.2.0-SNAPSHOT</version>
+    <version>1.4.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Worker-Policy Aggregator</name>
@@ -102,11 +102,15 @@
 
     <properties>
         <caf.base-container.policy-elasticsearch>cafdataprocessing/policy-elasticsearch-container:1.0.0-2</caf.base-container.policy-elasticsearch>
+        <caf.document.worker.version>3.1.0-PERF_REF_VALUES_31</caf.document.worker.version>
         <caf.worker.binaryhash.container.name>cafinternal/prereleases:worker-binaryhash-2.1.0-28</caf.worker.binaryhash.container.name>
         <caf.worker.langdetect.container.name>cafinternal/prereleases:worker-languagedetection-2.1.0-27</caf.worker.langdetect.container.name>
         <caf.boilerplate.version>2.0.1-7</caf.boilerplate.version>
         <caf.corepolicy.version>1.0.0-4</caf.corepolicy.version>
-        <caf.worker-framework.version>2.0.0-PERF_JSON_LZF_CODEC-SNAPSHOT</caf.worker-framework.version>
+        <caf.worker-framework.version>2.2.0-PERF_JSON_LZF_CODEC_22-SNAPSHOT</caf.worker-framework.version>
+        <dockerHubOrganization>cafdataprocessing</dockerHubOrganization>
+        <dockerCafDataProcessingOrg>${dockerImagePrefix}${dockerHubOrganization}${dockerOrgSeperator}</dockerCafDataProcessingOrg>
+        <dockerProjectVersion>${dockerVersionSeperator}${project.version}</dockerProjectVersion>
     </properties>
 
     <dependencyManagement>
@@ -149,12 +153,12 @@
             <dependency>
                 <groupId>com.github.cafdataprocessing</groupId>
                 <artifactId>worker-document-shared</artifactId>
-                <version>2.3.0-SNAPSHOT</version>
+                <version>${caf.document.worker.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafdataprocessing</groupId>
                 <artifactId>worker-markup-shared</artifactId>
-                <version>2.0.0-5</version>
+                <version>2.2.0-50</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafdataprocessing</groupId>

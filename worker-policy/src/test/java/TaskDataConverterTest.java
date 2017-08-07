@@ -28,6 +28,7 @@ import com.hpe.caf.api.worker.*;
 import com.github.cafdataprocessing.worker.policy.version.tagging.PolicyReprocessingVersionTagging;
 import com.hpe.caf.codec.JsonLzfCodec;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -41,11 +42,20 @@ import java.util.UUID;
  */
 public class TaskDataConverterTest {
 
-    @Mock
-    PolicyWorkerConverterInterface converter;
+    static PolicyWorkerConverterInterface converter;
 
     @Mock
     DataStore dataStore;
+
+    @BeforeClass
+    public static void setupConverter() throws PolicyWorkerConverterException, CodecException, InvalidTaskException {
+        //create an empty implementation of a converter for use with tests
+        converter = new PolicyWorkerConverterInterface() {
+            @Override
+            public void updateSupportedClassifierVersions(Multimap<String, Integer> supportedMap) {
+            }
+        };
+    }
 
     /**
      * Test to verify that calling the WorkerTask version of convert results in a field with the worker version information being added to the document.
@@ -63,10 +73,6 @@ public class TaskDataConverterTest {
         int version = 1;
 
         WorkerTaskData workerTaskData = createWorkerTaskData(codec, classifier, version, data, TaskStatus.RESULT_SUCCESS);
-
-        converter = Mockito.mock(PolicyWorkerConverterInterface.class);
-
-        Mockito.doNothing().when(converter).convert(Mockito.any());
 
         TaskData taskData = TaskDataConverter.convert(converter, codec, dataStore, workerTaskData);
 
@@ -95,10 +101,6 @@ public class TaskDataConverterTest {
         int version = 1;
 
         TestWorkerTaskData workerTaskData = (TestWorkerTaskData) createWorkerTaskData(codec, classifier, version, data, TaskStatus.RESULT_FAILURE);
-
-        converter = Mockito.mock(PolicyWorkerConverterInterface.class);
-
-        Mockito.doNothing().when(converter).convert(Mockito.any());
 
         TaskData taskData = TaskDataConverter.convert(converter, codec, dataStore, workerTaskData);
 

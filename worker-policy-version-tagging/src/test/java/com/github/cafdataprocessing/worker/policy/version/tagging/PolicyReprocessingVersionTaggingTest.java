@@ -15,6 +15,7 @@
  */
 package com.github.cafdataprocessing.worker.policy.version.tagging;
 
+import com.github.cafdataprocessing.worker.policy.shared.DocumentInterface;
 import com.google.common.collect.Multimap;
 import com.github.cafdataprocessing.worker.policy.shared.Document;
 import com.github.cafdataprocessing.entity.fields.DocumentProcessingRecord;
@@ -42,6 +43,65 @@ public class PolicyReprocessingVersionTaggingTest {
         Assert.assertEquals("Expecting processing field name returned by WorkerReprocessingVersionTagging to match " +
                         "expected field name.", expectedFieldName,
                 PolicyReprocessingVersionTagging.getProcessingFieldName(testClassifier));
+    }
+
+    @Test
+    public void addProcessingWorkerVersionToChildrenTest() throws PolicyReprocessingVersionTaggingException {
+        String testClassifier = UUID.randomUUID().toString();
+        String expectedFieldName = "PROCESSING_"+testClassifier+"_VERSION";
+        Document testDocument = new Document();
+        //add some sub documents to the document
+        DocumentInterface subDocument_1 = testDocument.addSubDocument(UUID.randomUUID().toString());
+        DocumentInterface subDocument_2 = testDocument.addSubDocument(UUID.randomUUID().toString());
+        //add another level of sub-documents to verify field also added to that level
+        DocumentInterface secondLevelSubDocument = subDocument_1.addSubDocument(UUID.randomUUID().toString());
+        //and another level of sub-documents to verify field also added to that level
+        DocumentInterface thirdLevelSubDocument = secondLevelSubDocument.addSubDocument(UUID.randomUUID().toString());
+
+        String testVersion = "testVersion";
+        WorkerProcessingInfo workerProcessingInfo = new WorkerProcessingInfo(testVersion,testClassifier);
+
+        PolicyReprocessingVersionTagging.addProcessingWorkerVersion(testDocument, workerProcessingInfo);
+
+        //check that version field was added to the root document
+        Collection<String> rootDocumentWorkerVersionValues = testDocument.getMetadata().get(expectedFieldName);
+        Assert.assertEquals("Expecting one worker version field to have been added to root document.",
+                1, rootDocumentWorkerVersionValues.size());
+        String rootDocumentVersionFieldValue = rootDocumentWorkerVersionValues.iterator().next();
+        Assert.assertEquals("Expecting worker version field added to root document to have expected value.",
+                testVersion, rootDocumentVersionFieldValue);
+
+        //check that version field was added to the first sub document at level one
+        Collection<String> subDocument_1_WorkerVersionValues = subDocument_1.getMetadata().get(expectedFieldName);
+        Assert.assertEquals("Expecting one worker version field to have been added to the first sub-document.",
+                1, subDocument_1_WorkerVersionValues.size());
+        String subDocument_1_WorkerVersionValue = subDocument_1_WorkerVersionValues.iterator().next();
+        Assert.assertEquals("Expecting worker version field added to first sub-document to have expected value.",
+                testVersion, subDocument_1_WorkerVersionValue);
+
+        //check that version field was added to the second sub document at level one
+        Collection<String> subDocument_2_WorkerVersionValues = subDocument_2.getMetadata().get(expectedFieldName);
+        Assert.assertEquals("Expecting one worker version field to have been added to the second sub-document.",
+                1, subDocument_2_WorkerVersionValues.size());
+        String subDocument_2_WorkerVersionValue = subDocument_2_WorkerVersionValues.iterator().next();
+        Assert.assertEquals("Expecting worker version field added to second sub-document to have expected value.",
+                testVersion, subDocument_2_WorkerVersionValue);
+
+        //check that version field was added to the sub document at level two
+        Collection<String> secondLevelSubDocumentWorkerVersionValues = secondLevelSubDocument.getMetadata().get(expectedFieldName);
+        Assert.assertEquals("Expecting one worker version field to have been added to the second level sub-document.",
+                1, secondLevelSubDocumentWorkerVersionValues.size());
+        String secondLevelSubDocumentWorkerVersionValue = secondLevelSubDocumentWorkerVersionValues.iterator().next();
+        Assert.assertEquals("Expecting worker version field added to second level sub-document to have expected value.",
+                testVersion, secondLevelSubDocumentWorkerVersionValue);
+
+        //check that version field was added to the second sub document at level three
+        Collection<String> thirdLevelSubDocumentWorkerVersionValues = thirdLevelSubDocument.getMetadata().get(expectedFieldName);
+        Assert.assertEquals("Expecting one worker version field to have been added to the third level sub-document.",
+                1, thirdLevelSubDocumentWorkerVersionValues.size());
+        String thirdLevelSubDocumentWorkerVersionValue = thirdLevelSubDocumentWorkerVersionValues.iterator().next();
+        Assert.assertEquals("Expecting worker version field added to third level sub-document to have expected value.",
+                testVersion, thirdLevelSubDocumentWorkerVersionValue);
     }
 
     /**
