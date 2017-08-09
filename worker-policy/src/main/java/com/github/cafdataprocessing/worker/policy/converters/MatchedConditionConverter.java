@@ -29,6 +29,7 @@ public class MatchedConditionConverter {
         MatchedCondition newMatchedCondition = new MatchedCondition();
         newMatchedCondition.setId(matchedCondition.id);
         newMatchedCondition.setName(matchedCondition.name);
+        newMatchedCondition.setReference(matchedCondition.getReference());
         return newMatchedCondition;
     }
 }

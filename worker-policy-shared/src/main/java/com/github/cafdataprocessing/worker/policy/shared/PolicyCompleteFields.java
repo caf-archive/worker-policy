@@ -21,4 +21,3 @@ package com.github.cafdataprocessing.worker.policy.shared;
 public class PolicyCompleteFields {
     public static String KV_POLICY_COMPLETE = "KV_POLICY_COMPLETE";
 }
-

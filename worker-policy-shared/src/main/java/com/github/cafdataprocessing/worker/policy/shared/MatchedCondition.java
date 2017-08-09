@@ -21,6 +21,7 @@ package com.github.cafdataprocessing.worker.policy.shared;
 public class MatchedCondition {
     private Long id;
     private String name;
+    private String reference;
 
     public Long getId() {
         return id;
@@ -37,4 +38,8 @@ public class MatchedCondition {
     public void setName(String name) {
         this.name = name;
     }
+
+    public String getReference(){ return reference; }
+
+    public void setReference(String reference){ this.reference = reference; }
 }
