@@ -21,12 +21,16 @@ import com.github.cafdataprocessing.corepolicy.common.DocumentFields;
  * Field values for use with this converter.
  */
 public class ClassificationWorkerConverterFields {
+    public static final String CLASSIFICATION_ID_FIELD = "CAF_CLASSIFICATION_ID";
+    public static final String CLASSIFICATION_NAME_FIELD = "CAF_CLASSIFICATION_NAME";
+    @Deprecated
     public static final String CLASSIFICATION_POLICYNAME_FIELD = "POLICY_MATCHED_POLICYNAME";
+    @Deprecated
     public static final String CLASSIFICATION_POLICYID_FIELD = "POLICY_MATCHED_POLICYID";
     public static final String CLASSIFICATION_MATCHED_COLLECTION = DocumentFields.SearchField_MatchedCollection;
     public static final String WORKER_NAME = "ClassificationWorker";
 
-
+    @Deprecated
     public static String getMatchedConditionField(long collectionId) {
         return DocumentFields.getMatchedConditionField(collectionId);
     }

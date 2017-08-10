@@ -195,10 +195,15 @@ public class DataProcessingIT extends BaseTestsHelper{
             Assert.assertTrue("Document should have POLICY_MATCHED_POLICYNAME in meta data", value.isPresent());
             Assert.assertEquals("Should have executed Tagging Policy", externalPolicyName, value.get());
 
-            value = metaData.get(ClassificationWorkerConverterFields.getMatchedConditionField(externalCollectionId)).stream().findFirst();
-            Assert.assertTrue("Document should have " + ClassificationWorkerConverterFields.getMatchedConditionField(externalConditionId)
-                    + " in meta data", value.isPresent());
-            Assert.assertEquals("Should have matched condition", String.valueOf(externalConditionId), value.get());
+            value = metaData.get(ClassificationWorkerConverterFields.CLASSIFICATION_ID_FIELD).stream().findFirst();
+            Assert.assertTrue("Document should have "+ClassificationWorkerConverterFields.CLASSIFICATION_ID_FIELD+
+                    " in meta data", value.isPresent());
+            Assert.assertEquals("Should have added classification ID field value.", String.valueOf(externalPolicyId), value.get());
+
+            value = metaData.get(ClassificationWorkerConverterFields.CLASSIFICATION_NAME_FIELD).stream().findFirst();
+            Assert.assertTrue("Document should have "+ClassificationWorkerConverterFields.CLASSIFICATION_NAME_FIELD+
+                    " in meta data", value.isPresent());
+            Assert.assertEquals("Should have added classification name field value.", externalPolicyName, value.get());
         } finally {
             closeRabbitConnections(resultsChannel, consumerResult);
         }
@@ -326,16 +331,22 @@ public class DataProcessingIT extends BaseTestsHelper{
 
             value = metaData.get(ClassificationWorkerConverterFields.CLASSIFICATION_POLICYID_FIELD).stream().findFirst();
             Assert.assertTrue("Document should have POLICY_MATCHED_POLICYID in meta data", value.isPresent());
-            Assert.assertEquals("Should have executed Tagging Policy", String.valueOf(externalPolicyId), value.get());
+            Assert.assertEquals("Should have added policy ID value.", String.valueOf(externalPolicyId), value.get());
 
             value = metaData.get(ClassificationWorkerConverterFields.CLASSIFICATION_POLICYNAME_FIELD).stream().findFirst();
             Assert.assertTrue("Document should have POLICY_MATCHED_POLICYNAME in meta data", value.isPresent());
-            Assert.assertEquals("Should have executed Tagging Policy", externalPolicyName, value.get());
+            Assert.assertEquals("Should have added policy name value.", externalPolicyName, value.get());
 
-            value = metaData.get(ClassificationWorkerConverterFields.getMatchedConditionField(externalCollectionId)).stream().findFirst();
-            Assert.assertTrue("Document should have " + ClassificationWorkerConverterFields.getMatchedConditionField(externalConditionId)
-                    + " in meta data", value.isPresent());
-            Assert.assertEquals("Should have matched condition", String.valueOf(externalConditionId), value.get());
+            value = metaData.get(ClassificationWorkerConverterFields.CLASSIFICATION_ID_FIELD).stream().findFirst();
+            Assert.assertTrue("Document should have "+ClassificationWorkerConverterFields.CLASSIFICATION_ID_FIELD+
+                    " in meta data", value.isPresent());
+            Assert.assertEquals("Should have added classification ID field value.", String.valueOf(externalPolicyId), value.get());
+
+            value = metaData.get(ClassificationWorkerConverterFields.CLASSIFICATION_NAME_FIELD).stream().findFirst();
+            Assert.assertTrue("Document should have "+ClassificationWorkerConverterFields.CLASSIFICATION_NAME_FIELD+
+                    " in meta data", value.isPresent());
+            Assert.assertEquals("Should have added classification name field value.", externalPolicyName, value.get());
+
         } finally {
             closeRabbitConnections(resultsChannel, consumerResult);
         }
@@ -445,9 +456,15 @@ public class DataProcessingIT extends BaseTestsHelper{
             Assert.assertTrue("Document should have POLICY_MATCHED_POLICYNAME in meta data", value.isPresent());
             Assert.assertEquals("Should have executed Tagging Policy", taggingPolicy.name, value.get());
 
-            value = metaData.get(ClassificationWorkerConverterFields.getMatchedConditionField(collection.id)).stream().findFirst();
-            Assert.assertTrue("Document should have " + ClassificationWorkerConverterFields.getMatchedConditionField(condition.id) + " in meta data", value.isPresent());
-            Assert.assertEquals("Should have matched condition", String.valueOf(condition.id), value.get());
+            value = metaData.get(ClassificationWorkerConverterFields.CLASSIFICATION_ID_FIELD).stream().findFirst();
+            Assert.assertTrue("Document should have "+ClassificationWorkerConverterFields.CLASSIFICATION_ID_FIELD+
+                    " in meta data", value.isPresent());
+            Assert.assertEquals("Should have added classification ID field value.", String.valueOf(taggingPolicy.id), value.get());
+
+            value = metaData.get(ClassificationWorkerConverterFields.CLASSIFICATION_NAME_FIELD).stream().findFirst();
+            Assert.assertTrue("Document should have "+ClassificationWorkerConverterFields.CLASSIFICATION_NAME_FIELD+
+                    " in meta data", value.isPresent());
+            Assert.assertEquals("Should have added classification name field value.", taggingPolicy.name, value.get());
         } finally {
             closeRabbitConnections(resultsChannel, consumerResult);
         }

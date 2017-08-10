@@ -17,11 +17,10 @@ package com.github.cafdataprocessing.worker.policy.shared;
 
 /**
  * Type of field being changed on the document
- * 
+ *
  * @author getty
  */
 public enum DocumentProcessingFieldType {
-
     REFERENCE,
     METADATA,
     METADATA_REFERENCE;

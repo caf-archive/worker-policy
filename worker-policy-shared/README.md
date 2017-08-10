@@ -210,3 +210,12 @@ Object that represents Collections the document matched.
         <td> A collection of the Policies that were assigned to this Collection.</td>
     </tr>
 </table>
+
+#### MatchedCondition
+Object that represents Conditions that were matched on a collection.
+
+| Name      | Type   | Description               |
+| --------- | ------ | ------------------------- |
+| id        | Long   | ID of the Condition that was matched. |
+| name      | String | Name of the Condition that was matched. |
+| reference | String | Reference of the document that matched the Condition. |

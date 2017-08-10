@@ -399,7 +399,7 @@
                 <configuration>
                     <verbose>true</verbose>
                     <logDate>default</logDate>
-                    <autoPull>always</autoPull>
+                    <autoPull>true</autoPull>
                     <useColor>true</useColor>
                     <images>
                         <image>
