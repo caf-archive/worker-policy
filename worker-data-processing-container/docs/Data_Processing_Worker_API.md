@@ -21,7 +21,7 @@ Transitory errors (such as an inability to connect to the database) thrown by th
 
 Other exceptions result in a failure result being created and sent to the Data Processing Worker output queue.
 
-###Logging
+### Logging
 
 The log level that the worker outputs at can be controlled by passing a file 'policy.yaml' specified as shown in the example below, on the path '/mnt/mesos/sandbox/';
 
@@ -32,7 +32,7 @@ logging:
     com.hpe.caf: DEBUG
 ```
 
-###Health Check
+### Health Check
 By default, Data Processing Worker implements no further health check beyond the basic one supplied by the CAF Framework.
 
 If Data Processing Worker is configured to use Elasticsearch, the Policy Worker health check will attempt to connect to its local Elasticsearch.
