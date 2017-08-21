@@ -104,7 +104,7 @@
         <caf.base-container.policy-elasticsearch>cafdataprocessing/policy-elasticsearch-container:1.0.0-2</caf.base-container.policy-elasticsearch>
         <caf.document.worker.version>3.1.0-68</caf.document.worker.version>
         <caf.binaryhash.version>2.1.0-28</caf.binaryhash.version>
-        <caf.worker.binaryhash.container.name>cafinternal/prereleases:worker-binaryhash-${caf.binaryhash.version}</caf.worker.binaryhash.container.name>
+        <caf.worker.binaryhash.container.name>cafdataprocessing/worker-binaryhash:2.1.0</caf.worker.binaryhash.container.name>
         <caf.worker.langdetect.container.name>cafdataprocessing/worker-languagedetection:2.3.0</caf.worker.langdetect.container.name>
         <caf.boilerplate.version>2.1.0-48</caf.boilerplate.version>
         <caf.corepolicy.version>1.0.0-4</caf.corepolicy.version>
