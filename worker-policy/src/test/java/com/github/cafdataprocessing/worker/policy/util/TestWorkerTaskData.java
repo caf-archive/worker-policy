@@ -18,6 +18,7 @@ package com.github.cafdataprocessing.worker.policy.util;
 import com.hpe.caf.api.worker.TaskSourceInfo;
 import com.hpe.caf.api.worker.TaskStatus;
 import com.hpe.caf.api.worker.TrackingInfo;
+import com.hpe.caf.api.worker.WorkerResponse;
 import com.hpe.caf.api.worker.WorkerTaskData;
 
 /**
@@ -113,5 +114,9 @@ public class TestWorkerTaskData implements WorkerTaskData{
     @Override
     public TaskSourceInfo getSourceInfo() {
         return sourceInfo;
+    }
+
+    @Override
+    public void addResponse(WorkerResponse workerResponse, boolean b) {
     }
 }
