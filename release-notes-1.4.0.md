@@ -9,4 +9,8 @@ ${version-number}
 - [CAF-3298](https://jira.autonomy.com/browse/CAF-3298): Apply matched classifications to relevant sub-documents.
   Classifications that matched due to a sub-document will now have the classification fields added to the relevant sub-document as well as the root document. New fields are added to the document, `CAF_CLASSIFICATION_ID` and `CAF_CLASSIFICATION_NAME`, which will have the same values as the existing `POLICY_MATCHED_POLICYID` and `POLICY_MATCHED_POLICYNAME` fields. The intention is to make the meaning of these field values clearer in the context of data processing. `POLICY_MATCHED_COLLECTION`, `POLICY_MATCHED_POLICYID` and `POLICY_MATCHED_POLICYNAME` are considered deprecated and liable for removal in a future release. The `POLICY_MATCHED_CONDITION_` fields are no longer added to documents.
 
+#### Bug Fixes
+- [CAF-3434](https://jira.autonomy.com/browse/CAF-3434):  Add priority queue support for job service  
+  The latest release of the Document Worker Framework has been adopted, which includes a Worker Framework correction to handle null priority values in forwarded messages.
+
 #### Known Issues
