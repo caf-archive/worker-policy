@@ -511,6 +511,9 @@
                                         <args>--</args>
                                     </exec>
                                 </entryPoint>
+                                <healthCheck>
+                                    <cmd>curl -f http://localhost:8081/healthcheck || exit 1</cmd>
+                                </healthCheck>
                                 <cmd>/opt/${fileSet.outputDirectory}/start.sh</cmd>
                                 <assembly>
                                     <basedir>/opt</basedir>
