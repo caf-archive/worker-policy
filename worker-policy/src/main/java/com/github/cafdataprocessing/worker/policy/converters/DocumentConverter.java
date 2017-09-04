@@ -23,6 +23,7 @@ import com.hpe.caf.api.worker.DataStoreSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.InputStream;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -65,6 +66,12 @@ public class DocumentConverter {
         return newDocument;
     }
 
+    /**
+     * Converts the core policy document provided to a worker policy representation, copying metadata and streams to
+     * metadata and metadata reference fields and converting any sub-documents also.
+     * @param document Core policy document to convert
+     * @return Converted version of passed document.
+     */
     public com.github.cafdataprocessing.worker.policy.shared.Document convert(Document document) {
         com.github.cafdataprocessing.worker.policy.shared.Document newDocument =
                 new com.github.cafdataprocessing.worker.policy.shared.Document();
@@ -73,6 +80,17 @@ public class DocumentConverter {
         if (document.getMetadata() != null) {
             for (Map.Entry<String, String> entry : document.getMetadata().entries()) {
                 newDocument.getMetadata().put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        //copy the ReferenceData of any DataStoreAwareInputStreams as metadata references on new document
+        if(document.getStreams() != null) {
+            for (Map.Entry<String, InputStream> streamEntry : document.getStreams().entries()){
+                if(streamEntry.getValue() == null || !(streamEntry.getValue() instanceof DataStoreAwareInputStream)){
+                    continue;
+                }
+                DataStoreAwareInputStream asDataStoreStreamEntry = (DataStoreAwareInputStream) streamEntry.getValue();
+                newDocument.getMetadataReferences().put(streamEntry.getKey(), asDataStoreStreamEntry.getReferencedData());
             }
         }
 

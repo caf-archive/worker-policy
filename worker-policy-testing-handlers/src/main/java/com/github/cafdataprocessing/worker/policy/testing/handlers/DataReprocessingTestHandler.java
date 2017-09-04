@@ -50,9 +50,6 @@ public class DataReprocessingTestHandler extends WorkerTaskResponsePolicyHandler
 
         com.github.cafdataprocessing.worker.policy.shared.Document finalPolicyWorkerOutput = new DocumentConverter().convert(document);
         if (currentPolicyWorkerDoc != null){
-            if(currentPolicyWorkerDoc.getMetadataReferences() != null) {
-                finalPolicyWorkerOutput.setMetadataReferences(currentPolicyWorkerDoc.getMetadataReferences());
-            }
             //need to record processing record on this new Policy Worker Shared Document
             DocumentProcessingRecord taskDataProcessingRecord = currentPolicyWorkerDoc.getPolicyDataProcessingRecord();
             if(taskDataProcessingRecord!=null) {

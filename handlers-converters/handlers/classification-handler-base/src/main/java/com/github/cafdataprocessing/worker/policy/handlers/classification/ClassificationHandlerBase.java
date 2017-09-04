@@ -49,7 +49,6 @@ public abstract class ClassificationHandlerBase extends WorkerTaskResponsePolicy
 
         taskData.setProjectId(applicationContext.getBean(UserContext.class).getProjectId());
         com.github.cafdataprocessing.worker.policy.shared.Document documentToClassify = new DocumentConverter().convert(document);
-        documentToClassify.setMetadataReferences(taskDataDocumentToClassify.getMetadataReferences());
         taskData.setDocument(documentToClassify);
         taskData.setExecutePolicyOnClassifiedDocuments(false);
         taskData.setOutputPartialReference(currentTaskData.getOutputPartialReference());

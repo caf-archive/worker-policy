@@ -151,4 +151,12 @@ public class DataStoreAwareInputStream extends InputStream {
 
         return streamForDataStore.markSupported();
     }
+
+    /**
+     * Returns the ReferencedData associated with this DataStoreAwareInputStream
+     * @return the ReferencedData associated with this DataStoreAwareInputStream
+     */
+    public ReferencedData getReferencedData(){
+        return this.referencedData;
+    }
 }

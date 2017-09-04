@@ -50,9 +50,6 @@ public class GenericQueueHandler extends WorkerTaskResponsePolicyHandler {
 
         com.github.cafdataprocessing.worker.policy.shared.Document documentToClassify = new DocumentConverter().convert(document);
         if (taskDataDocumentToClassify != null){
-            if(taskDataDocumentToClassify.getMetadataReferences() != null) {
-                documentToClassify.setMetadataReferences(taskDataDocumentToClassify.getMetadataReferences());
-            }
             //need to record processing record on this new Policy Worker Shared Document
             DocumentProcessingRecord taskDataProcessingRecord = taskDataDocumentToClassify.getPolicyDataProcessingRecord();
             if(taskDataProcessingRecord!=null) {
