@@ -24,6 +24,7 @@ import com.github.cafdataprocessing.corepolicy.common.dto.Policy;
 import com.github.cafdataprocessing.corepolicy.common.dto.PolicyType;
 import com.github.cafdataprocessing.worker.policy.WorkerResponseHolder;
 import com.github.cafdataprocessing.worker.policy.WorkerTaskResponsePolicyHandler;
+import com.github.cafdataprocessing.worker.policy.common.DataStoreAwareInputStream;
 import com.github.cafdataprocessing.worker.policy.shared.TaskData;
 import com.google.common.base.Strings;
 import com.hpe.caf.api.worker.InvalidTaskException;
@@ -36,6 +37,7 @@ import com.hpe.caf.worker.document.DocumentWorkerFieldValue;
 import com.hpe.caf.worker.document.DocumentWorkerFieldEncoding;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 import org.slf4j.Logger;
@@ -144,10 +146,17 @@ public class CompositeDocumentWorkerHandler extends WorkerTaskResponsePolicyHand
          */
         document.getMetadata().entries().stream()
             .forEach(metadata -> addToWorkerTaskFields(fieldsMap, metadata.getKey(), createWorkerData(metadata.getValue())));
-        if (taskDataDocumentToClassify != null) {
-            taskDataDocumentToClassify.getMetadataReferences().entries().stream()
-                .forEach(metadataReference -> addToWorkerTaskFields(fieldsMap, metadataReference.getKey(),
-                                                                    createWorkerData(metadataReference.getValue())));
+
+        //copy the ReferenceData of any DataStoreAwareInputStreams as metadata references on new document
+        if(document.getStreams() != null) {
+            for (Map.Entry<String, InputStream> streamEntry : document.getStreams().entries()){
+                if(streamEntry.getValue() == null || !(streamEntry.getValue() instanceof DataStoreAwareInputStream)){
+                    continue;
+                }
+                DataStoreAwareInputStream asDataStoreStreamEntry = (DataStoreAwareInputStream) streamEntry.getValue();
+                addToWorkerTaskFields(fieldsMap, streamEntry.getKey(),
+                        createWorkerData(asDataStoreStreamEntry.getReferencedData()));
+            }
         }
 
         return fieldsMap;

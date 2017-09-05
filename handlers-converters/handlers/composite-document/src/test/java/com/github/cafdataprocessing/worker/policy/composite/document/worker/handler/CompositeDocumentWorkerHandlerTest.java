@@ -25,6 +25,7 @@ import com.github.cafdataprocessing.corepolicy.common.dto.PolicyType;
 import com.github.cafdataprocessing.worker.policy.WorkerRequestHolder;
 import com.github.cafdataprocessing.worker.policy.WorkerResponseHolder;
 import com.github.cafdataprocessing.worker.policy.WorkerTaskResponsePolicyHandler;
+import com.github.cafdataprocessing.worker.policy.common.DataStoreAwareInputStream;
 import com.github.cafdataprocessing.worker.policy.shared.TaskData;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
@@ -97,12 +98,21 @@ public class CompositeDocumentWorkerHandlerTest
         String childInfo2HashValue = UUID.randomUUID().toString();
         document.getMetadata().put("CHILD_1_INFO_2", childInfo2HashValue);
 
+        String expectedRefValue = UUID.randomUUID().toString();
+        document.getMetadata().put("expected_ref_value", expectedRefValue);
+        addMetadataReferenceToCorePolicyDocument(document, "ref_1", ReferencedData.getReferencedData(expectedRefValue));
+
         if(generateChildren) {
             for (int i = 0; i < 3; i++) {
                 document.getDocuments().add(setupDocument(false));
             }
         }
         return document;
+    }
+
+    private void addMetadataReferenceToCorePolicyDocument(Document document, String key, ReferencedData value){
+        document.getStreams().put(key,
+                new DataStoreAwareInputStream(value, null));
     }
 
     private Document setupDocument(Multimap<String, ReferencedData> metadataReferences)
@@ -118,13 +128,14 @@ public class CompositeDocumentWorkerHandlerTest
         testFields.put("DOC_FIELD_NAME_2", "value2");
         testFields.put("DOC_FIELD_NAME_3", "value3");
         document.getMetadata().putAll(testFields);
+        for(Map.Entry<String, ReferencedData> metadataReference: metadataReferences.entries()) {
+            addMetadataReferenceToCorePolicyDocument(document, metadataReference.getKey(), metadataReference.getValue());
+        }
 
-        //set up document with metadata references
         WorkerResponseHolder workerResponseHolder = applicationContext.getBean(WorkerResponseHolder.class);
         com.github.cafdataprocessing.worker.policy.shared.Document taskDataDocument
             = new com.github.cafdataprocessing.worker.policy.shared.Document();
 
-        taskDataDocument.setMetadataReferences(metadataReferences);
         TaskData testTaskData = new TaskData();
         testTaskData.setDocument(taskDataDocument);
         testTaskData.setOutputPartialReference(UUID.randomUUID().toString());
@@ -174,6 +185,10 @@ public class CompositeDocumentWorkerHandlerTest
         Assert.assertTrue(taskFields.containsKey("caf-mail-conversation-index"));
         Assert.assertTrue(taskFields.containsKey("caf-mail-in-reply-to"));
         Assert.assertTrue(taskFields.containsKey("TestWithNullValue"));
+        Assert.assertTrue(taskFields.containsKey("expected_ref_value"));
+        String expectedRefValue = taskFields.get("expected_ref_value").iterator().next().data;
+        Assert.assertTrue(taskFields.containsKey("ref_1"));
+        Assert.assertEquals(expectedRefValue, taskFields.get("ref_1").iterator().next().data);
     }
 
     @Test
@@ -218,6 +233,12 @@ public class CompositeDocumentWorkerHandlerTest
             Assert.assertTrue(taskFields.containsKey("caf-mail-conversation-index"));
             Assert.assertTrue(taskFields.containsKey("caf-mail-in-reply-to"));
             Assert.assertTrue(taskFields.containsKey("TestWithNullValue"));
+
+            Assert.assertTrue(taskFields.containsKey("expected_ref_value"));
+            String expectedRefValue = taskFields.get("expected_ref_value").iterator().next().data;
+
+            Assert.assertTrue(taskFields.containsKey("ref_1"));
+            Assert.assertEquals(expectedRefValue, taskFields.get("ref_1").iterator().next().data);
         }
     }
 
