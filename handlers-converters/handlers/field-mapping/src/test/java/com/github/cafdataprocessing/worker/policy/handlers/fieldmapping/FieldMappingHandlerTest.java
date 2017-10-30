@@ -21,8 +21,10 @@ import com.github.cafdataprocessing.corepolicy.common.DocumentImpl;
 import com.github.cafdataprocessing.corepolicy.common.dto.Policy;
 import org.junit.Assert;
 import org.junit.Test;
-
+import java.io.ByteArrayInputStream;
+import org.apache.commons.io.IOUtils;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class FieldMappingHandlerTest
 {
@@ -33,13 +35,13 @@ public class FieldMappingHandlerTest
         final Document document = setupDocument();
         final Policy testPolicy = new Policy();
         testPolicy.id = 1L;
-        testPolicy.details = new ObjectMapper().readTree("{" +
-                "  \"mappings\":" +
-                "  {" +
-                "    \"abc\": \"def\"," +
-                "    \"PQR\": \"xyz\"" +
-                "  }" +
-                "}");
+        testPolicy.details = new ObjectMapper().readTree("{"
+            + "  \"mappings\":"
+            + "  {"
+            + "    \"abc\": \"def\","
+            + "    \"PQR\": \"xyz\""
+            + "  }"
+            + "}");
         final Long testColSeqId = 1L;
 
         //Act
@@ -61,12 +63,12 @@ public class FieldMappingHandlerTest
         final Document document = setupDocument();
         final Policy testPolicy = new Policy();
         testPolicy.id = 1L;
-        testPolicy.details = new ObjectMapper().readTree("{" +
-                "  \"mappings\":" +
-                "  {" +
-                "    \"absentField\": \"def\"" +
-                "  }" +
-                "}");
+        testPolicy.details = new ObjectMapper().readTree("{"
+            + "  \"mappings\":"
+            + "  {"
+            + "    \"absentField\": \"def\""
+            + "  }"
+            + "}");
         final Long testColSeqId = 1L;
 
         //Act
@@ -87,14 +89,14 @@ public class FieldMappingHandlerTest
         final Document document = setupDocument();
         final Policy testPolicy = new Policy();
         testPolicy.id = 1L;
-        testPolicy.details = new ObjectMapper().readTree("{" +
-                "  \"mappings\":" +
-                "  {" +
-                "    \"abc\": \"Def\"," +
-                "    \"DEF\": \"pqr\"," +
-                "    \"pqr\": \"ABC\"" +
-                "  }" +
-                "}");
+        testPolicy.details = new ObjectMapper().readTree("{"
+            + "  \"mappings\":"
+            + "  {"
+            + "    \"abc\": \"Def\","
+            + "    \"DEF\": \"pqr\","
+            + "    \"pqr\": \"ABC\""
+            + "  }"
+            + "}");
         final Long testColSeqId = 1L;
 
         //Act
@@ -122,14 +124,14 @@ public class FieldMappingHandlerTest
         final Document document = setupDocument();
         final Policy testPolicy = new Policy();
         testPolicy.id = 1L;
-        testPolicy.details = new ObjectMapper().readTree("{" +
-                "  \"mappings\":" +
-                "  {" +
-                "    \"abc\": \"xyz\"," +
-                "    \"def\": \"pqr\"," +
-                "    \"pqr\": \"xyz\"" +
-                "  }" +
-                "}");
+        testPolicy.details = new ObjectMapper().readTree("{"
+            + "  \"mappings\":"
+            + "  {"
+            + "    \"abc\": \"xyz\","
+            + "    \"def\": \"pqr\","
+            + "    \"pqr\": \"xyz\""
+            + "  }"
+            + "}");
         final Long testColSeqId = 1L;
 
         //Act
@@ -157,41 +159,46 @@ public class FieldMappingHandlerTest
         final Document document = setupDocument();
         final Policy testPolicy = new Policy();
         testPolicy.id = 1L;
-        testPolicy.details = new ObjectMapper().readTree("{" +
-                "  \"mappings\":" +
-                "  {" +
-                "    \"abc\": \"xyz\"," +
-                "    \"def\": \"pqr\"," +
-                "    \"pqr\": \"xyz\"," +
-                "    \"jkl\": \"wrx\"" +
-                "  }" +
-                "}");
+        testPolicy.details = new ObjectMapper().readTree("{"
+            + "  \"mappings\":"
+            + "  {"
+            + "    \"abc\": \"xyz\","
+            + "    \"def\": \"pqr\","
+            + "    \"pqr\": \"xyz\","
+            + "    \"jkl\": \"wrx\""
+            + "  }"
+            + "}");
         final Long testColSeqId = 1L;
+        try (final ByteArrayInputStream stream = new ByteArrayInputStream("This is a test string".getBytes(StandardCharsets.UTF_8))) {
+            document.getStreams().put("abc", stream);
+            document.getStreams().put("def", stream);
+            document.getStreams().put("jkl", stream);
 
-        //Act
-        final FieldMappingHandler handler = new FieldMappingHandler();
-        handler.handle(document, testPolicy, testColSeqId);
+            //Act
+            final FieldMappingHandler handler = new FieldMappingHandler();
+            handler.handle(document, testPolicy, testColSeqId);
 
-        //Assert
-        Assert.assertTrue(document.getMetadata().get("xyz").contains("abc-value1"));
-        Assert.assertTrue(document.getMetadata().get("xyz").contains("abc-value2"));
-        Assert.assertTrue(document.getMetadata().get("xyz").contains("pqr-value1"));
-        Assert.assertTrue(document.getMetadata().get("xyz").contains("pqr-value2"));
-        Assert.assertTrue(document.getMetadata().get("xyz").contains("xyz-value1"));
-        Assert.assertTrue(document.getMetadata().get("xyz").contains("xyz-value2"));
+            //Assert
+            Assert.assertTrue(document.getMetadata().get("xyz").contains("abc-value1"));
+            Assert.assertTrue(document.getMetadata().get("xyz").contains("abc-value2"));
+            Assert.assertTrue(document.getMetadata().get("xyz").contains("pqr-value1"));
+            Assert.assertTrue(document.getMetadata().get("xyz").contains("pqr-value2"));
+            Assert.assertTrue(document.getMetadata().get("xyz").contains("xyz-value1"));
+            Assert.assertTrue(document.getMetadata().get("xyz").contains("xyz-value2"));
 
-        Assert.assertTrue(document.getMetadata().get("pqr").contains("def-value1"));
-        Assert.assertTrue(document.getMetadata().get("pqr").contains("def-value2"));
+            Assert.assertTrue(document.getMetadata().get("pqr").contains("def-value1"));
+            Assert.assertTrue(document.getMetadata().get("pqr").contains("def-value2"));
 
-        Assert.assertTrue(document.getMetadata().get("abc").isEmpty());
-        
-        Assert.assertTrue(document.getStreams().containsKey("xyz"));
-        Assert.assertTrue(document.getStreams().containsKey("pqr"));
-        Assert.assertTrue(document.getStreams().containsKey("wrx"));
+            Assert.assertTrue(document.getMetadata().get("abc").isEmpty());
+
+            Assert.assertEquals(document.getStreams().get("xyz").stream().findFirst().get(), stream);
+            Assert.assertEquals(document.getStreams().get("pqr").stream().findFirst().get(), stream);
+            Assert.assertEquals(document.getStreams().get("wrx").stream().findFirst().get(), stream);
+        }
     }
 
-
-    private Document setupDocument(){
+    private Document setupDocument()
+    {
         final Document document = new DocumentImpl();
         document.setReference("test");
 
@@ -206,10 +213,6 @@ public class FieldMappingHandlerTest
 
         document.getMetadata().put("xyz", "xyz-value1");
         document.getMetadata().put("xyz", "xyz-value2");
-        
-        document.getStreams().put("abc", null);
-        document.getStreams().put("def", null);
-        document.getStreams().put("jkl", null);
         return document;
     }
 }
