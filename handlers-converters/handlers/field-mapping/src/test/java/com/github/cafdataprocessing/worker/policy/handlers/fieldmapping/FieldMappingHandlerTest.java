@@ -150,6 +150,46 @@ public class FieldMappingHandlerTest
         Assert.assertTrue(document.getMetadata().get("abc").isEmpty());
     }
 
+    @Test
+    public void testFieldNameMappingOfEncodedField() throws IOException
+    {
+        //Arrange
+        final Document document = setupDocument();
+        final Policy testPolicy = new Policy();
+        testPolicy.id = 1L;
+        testPolicy.details = new ObjectMapper().readTree("{" +
+                "  \"mappings\":" +
+                "  {" +
+                "    \"abc\": \"xyz\"," +
+                "    \"def\": \"pqr\"," +
+                "    \"pqr\": \"xyz\"," +
+                "    \"jkl\": \"wrx\"" +
+                "  }" +
+                "}");
+        final Long testColSeqId = 1L;
+
+        //Act
+        final FieldMappingHandler handler = new FieldMappingHandler();
+        handler.handle(document, testPolicy, testColSeqId);
+
+        //Assert
+        Assert.assertTrue(document.getMetadata().get("xyz").contains("abc-value1"));
+        Assert.assertTrue(document.getMetadata().get("xyz").contains("abc-value2"));
+        Assert.assertTrue(document.getMetadata().get("xyz").contains("pqr-value1"));
+        Assert.assertTrue(document.getMetadata().get("xyz").contains("pqr-value2"));
+        Assert.assertTrue(document.getMetadata().get("xyz").contains("xyz-value1"));
+        Assert.assertTrue(document.getMetadata().get("xyz").contains("xyz-value2"));
+
+        Assert.assertTrue(document.getMetadata().get("pqr").contains("def-value1"));
+        Assert.assertTrue(document.getMetadata().get("pqr").contains("def-value2"));
+
+        Assert.assertTrue(document.getMetadata().get("abc").isEmpty());
+        
+        Assert.assertTrue(document.getStreams().containsKey("xyz"));
+        Assert.assertTrue(document.getStreams().containsKey("pqr"));
+        Assert.assertTrue(document.getStreams().containsKey("wrx"));
+    }
+
 
     private Document setupDocument(){
         final Document document = new DocumentImpl();
@@ -166,6 +206,10 @@ public class FieldMappingHandlerTest
 
         document.getMetadata().put("xyz", "xyz-value1");
         document.getMetadata().put("xyz", "xyz-value2");
+        
+        document.getStreams().put("abc", null);
+        document.getStreams().put("def", null);
+        document.getStreams().put("jkl", null);
         return document;
     }
 }
