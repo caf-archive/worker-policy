@@ -22,7 +22,6 @@ import com.github.cafdataprocessing.corepolicy.common.dto.Policy;
 import org.junit.Assert;
 import org.junit.Test;
 import java.io.ByteArrayInputStream;
-import org.apache.commons.io.IOUtils;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
