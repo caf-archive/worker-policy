@@ -19,13 +19,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.github.cafdataprocessing.corepolicy.ProcessingAction;
+import com.github.cafdataprocessing.corepolicy.common.CaseInsensitiveKeyMultimap;
 import com.github.cafdataprocessing.corepolicy.common.Document;
 import com.github.cafdataprocessing.corepolicy.common.dto.ConflictResolutionMode;
 import com.github.cafdataprocessing.corepolicy.common.dto.Policy;
 import com.github.cafdataprocessing.corepolicy.common.dto.PolicyType;
 import com.github.cafdataprocessing.corepolicy.multimap.utils.CaseInsensitiveMultimap;
 import com.github.cafdataprocessing.worker.policy.WorkerPolicyHandler;
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.io.InputStream;
 import org.slf4j.Logger;
@@ -107,7 +107,7 @@ public class FieldMappingHandler extends WorkerPolicyHandler
     private Multimap<String, InputStream> getReferenceFieldsToBeMapped(final Map<String, String> fieldNameMappings,
                                                                        final Multimap<String, InputStream> documentMetadata)
     {
-        final Multimap<String, InputStream> fieldsToMap = ArrayListMultimap.create();
+        final Multimap<String, InputStream> fieldsToMap = new CaseInsensitiveKeyMultimap<>();
         fieldNameMappings.keySet()
             .forEach(fieldNameToMap
                 -> fieldsToMap.putAll(fieldNameToMap, documentMetadata.get(fieldNameToMap)));
