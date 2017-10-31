@@ -16,22 +16,49 @@
 package com.github.cafdataprocessing.worker.policy.handlers.fieldmapping;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.cafdataprocessing.corepolicy.common.CaseInsensitiveKeyMultimap;
+import com.github.cafdataprocessing.corepolicy.common.CorePolicyApplicationContext;
 import com.github.cafdataprocessing.corepolicy.common.Document;
 import com.github.cafdataprocessing.corepolicy.common.DocumentImpl;
 import com.github.cafdataprocessing.corepolicy.common.dto.Policy;
+import com.github.cafdataprocessing.worker.policy.WorkerRequestHolder;
+import com.github.cafdataprocessing.worker.policy.WorkerResponseHolder;
+import com.github.cafdataprocessing.worker.policy.shared.TaskData;
+import com.google.common.collect.Multimap;
+import com.hpe.caf.util.ref.ReferencedData;
 import org.junit.Assert;
 import org.junit.Test;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
+import org.junit.Before;
+import org.springframework.beans.factory.support.RootBeanDefinition;
 
 public class FieldMappingHandlerTest
 {
+    private CorePolicyApplicationContext applicationContext;
+    private FieldMappingHandler handler;
+
+    @Before
+    public void setupApplicationContext()
+    {
+        this.applicationContext = new CorePolicyApplicationContext();
+
+        createBeanDefinition(WorkerResponseHolder.class, "WorkerResponseHolder", "thread");
+        createBeanDefinition(WorkerRequestHolder.class, "WorkerRequestHolder", "thread");
+
+        applicationContext.refresh();
+        applicationContext.getBean(WorkerRequestHolder.class).clear();
+        applicationContext.getBean(WorkerResponseHolder.class).setTaskData(new TaskData());
+        handler = new FieldMappingHandler();
+        handler.setApplicationContext(applicationContext);
+    }
+
     @Test
     public void testSimpleRenaming() throws IOException
     {
         //Arrange
-        final Document document = setupDocument();
+        final Document document = setupDocument(null);
         final Policy testPolicy = new Policy();
         testPolicy.id = 1L;
         testPolicy.details = new ObjectMapper().readTree("{"
@@ -44,7 +71,6 @@ public class FieldMappingHandlerTest
         final Long testColSeqId = 1L;
 
         //Act
-        final FieldMappingHandler handler = new FieldMappingHandler();
         handler.handle(document, testPolicy, testColSeqId);
 
         //Assert
@@ -59,7 +85,7 @@ public class FieldMappingHandlerTest
     public void testAbsentSourceFieldDoesntDeleteTargetField() throws IOException
     {
         //Arrange
-        final Document document = setupDocument();
+        final Document document = setupDocument(null);
         final Policy testPolicy = new Policy();
         testPolicy.id = 1L;
         testPolicy.details = new ObjectMapper().readTree("{"
@@ -71,7 +97,6 @@ public class FieldMappingHandlerTest
         final Long testColSeqId = 1L;
 
         //Act
-        final FieldMappingHandler handler = new FieldMappingHandler();
         handler.handle(document, testPolicy, testColSeqId);
 
         //Assert
@@ -85,7 +110,7 @@ public class FieldMappingHandlerTest
     public void testFieldNameSwap() throws IOException
     {
         //Arrange
-        final Document document = setupDocument();
+        final Document document = setupDocument(null);
         final Policy testPolicy = new Policy();
         testPolicy.id = 1L;
         testPolicy.details = new ObjectMapper().readTree("{"
@@ -99,7 +124,6 @@ public class FieldMappingHandlerTest
         final Long testColSeqId = 1L;
 
         //Act
-        final FieldMappingHandler handler = new FieldMappingHandler();
         handler.handle(document, testPolicy, testColSeqId);
 
         //Assert
@@ -120,7 +144,7 @@ public class FieldMappingHandlerTest
     public void testFieldNameSwapWithCommonTargetName() throws IOException
     {
         //Arrange
-        final Document document = setupDocument();
+        final Document document = setupDocument(null);
         final Policy testPolicy = new Policy();
         testPolicy.id = 1L;
         testPolicy.details = new ObjectMapper().readTree("{"
@@ -134,7 +158,6 @@ public class FieldMappingHandlerTest
         final Long testColSeqId = 1L;
 
         //Act
-        final FieldMappingHandler handler = new FieldMappingHandler();
         handler.handle(document, testPolicy, testColSeqId);
 
         //Assert
@@ -154,8 +177,15 @@ public class FieldMappingHandlerTest
     @Test
     public void testFieldNameMappingOfEncodedField() throws IOException
     {
+        final Multimap<String, ReferencedData> metadataReferences = new CaseInsensitiveKeyMultimap<>();
+        final ReferencedData ref1 = ReferencedData.getWrappedData("ReferenceField1'sValue".getBytes(StandardCharsets.UTF_8));
+        final ReferencedData ref2 = ReferencedData.getWrappedData("ReferenceField2'sValue".getBytes(StandardCharsets.UTF_8));
+        final ReferencedData ref3 = ReferencedData.getWrappedData("ReferenceField3'sValue".getBytes(StandardCharsets.UTF_8));
+        metadataReferences.put("abc", ref1);
+        metadataReferences.put("def", ref2);
+        metadataReferences.put("jkl", ref3);
         //Arrange
-        final Document document = setupDocument();
+        final Document document = setupDocument(metadataReferences);
         final Policy testPolicy = new Policy();
         testPolicy.id = 1L;
         testPolicy.details = new ObjectMapper().readTree("{"
@@ -168,35 +198,32 @@ public class FieldMappingHandlerTest
             + "  }"
             + "}");
         final Long testColSeqId = 1L;
-        try (final ByteArrayInputStream stream = new ByteArrayInputStream("This is a test string".getBytes(StandardCharsets.UTF_8))) {
-            document.getStreams().put("abc", stream);
-            document.getStreams().put("def", stream);
-            document.getStreams().put("jkl", stream);
 
-            //Act
-            final FieldMappingHandler handler = new FieldMappingHandler();
-            handler.handle(document, testPolicy, testColSeqId);
+        //Act
+        handler.handle(document, testPolicy, testColSeqId);
 
-            //Assert
-            Assert.assertTrue(document.getMetadata().get("xyz").contains("abc-value1"));
-            Assert.assertTrue(document.getMetadata().get("xyz").contains("abc-value2"));
-            Assert.assertTrue(document.getMetadata().get("xyz").contains("pqr-value1"));
-            Assert.assertTrue(document.getMetadata().get("xyz").contains("pqr-value2"));
-            Assert.assertTrue(document.getMetadata().get("xyz").contains("xyz-value1"));
-            Assert.assertTrue(document.getMetadata().get("xyz").contains("xyz-value2"));
+        //Assert
+        Assert.assertTrue(document.getMetadata().get("xyz").contains("abc-value1"));
+        Assert.assertTrue(document.getMetadata().get("xyz").contains("abc-value2"));
+        Assert.assertTrue(document.getMetadata().get("xyz").contains("pqr-value1"));
+        Assert.assertTrue(document.getMetadata().get("xyz").contains("pqr-value2"));
+        Assert.assertTrue(document.getMetadata().get("xyz").contains("xyz-value1"));
+        Assert.assertTrue(document.getMetadata().get("xyz").contains("xyz-value2"));
 
-            Assert.assertTrue(document.getMetadata().get("pqr").contains("def-value1"));
-            Assert.assertTrue(document.getMetadata().get("pqr").contains("def-value2"));
+        Assert.assertTrue(document.getMetadata().get("pqr").contains("def-value1"));
+        Assert.assertTrue(document.getMetadata().get("pqr").contains("def-value2"));
 
-            Assert.assertTrue(document.getMetadata().get("abc").isEmpty());
+        Assert.assertTrue(document.getMetadata().get("abc").isEmpty());
 
-            Assert.assertEquals(document.getStreams().get("xyz").stream().findFirst().get(), stream);
-            Assert.assertEquals(document.getStreams().get("pqr").stream().findFirst().get(), stream);
-            Assert.assertEquals(document.getStreams().get("wrx").stream().findFirst().get(), stream);
-        }
+        Assert.assertEquals(applicationContext.getBean(WorkerResponseHolder.class).getTaskData().getDocument().getMetadataReferences()
+            .get("xyz").stream().findFirst().get(), ref1);
+        Assert.assertEquals(applicationContext.getBean(WorkerResponseHolder.class).getTaskData().getDocument().getMetadataReferences()
+            .get("pqr").stream().findFirst().get(), ref2);
+        Assert.assertEquals(applicationContext.getBean(WorkerResponseHolder.class).getTaskData().getDocument().getMetadataReferences()
+            .get("wrx").stream().findFirst().get(), ref3);
     }
 
-    private Document setupDocument()
+    private Document setupDocument(final Multimap<String, ReferencedData> metadataReferences)
     {
         final Document document = new DocumentImpl();
         document.setReference("test");
@@ -212,6 +239,26 @@ public class FieldMappingHandlerTest
 
         document.getMetadata().put("xyz", "xyz-value1");
         document.getMetadata().put("xyz", "xyz-value2");
+
+        WorkerResponseHolder workerResponseHolder = applicationContext.getBean(WorkerResponseHolder.class);
+        com.github.cafdataprocessing.worker.policy.shared.Document taskDataDocument
+            = new com.github.cafdataprocessing.worker.policy.shared.Document();
+        if (metadataReferences != null) {
+            taskDataDocument.setMetadataReferences(metadataReferences);
+        }
+        TaskData testTaskData = new TaskData();
+        testTaskData.setDocument(taskDataDocument);
+        testTaskData.setOutputPartialReference(UUID.randomUUID().toString());
+        workerResponseHolder.setTaskData(testTaskData);
         return document;
+    }
+
+    private void createBeanDefinition(Class<?> beanClass, String beanClassName, String beanScope)
+    {
+        RootBeanDefinition beanDefinition = new RootBeanDefinition();
+        beanDefinition.setScope(beanScope);
+        beanDefinition.setBeanClass(beanClass);
+
+        applicationContext.registerBeanDefinition(beanClassName, beanDefinition);
     }
 }

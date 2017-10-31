@@ -26,7 +26,9 @@ import com.github.cafdataprocessing.corepolicy.common.dto.Policy;
 import com.github.cafdataprocessing.corepolicy.common.dto.PolicyType;
 import com.github.cafdataprocessing.corepolicy.multimap.utils.CaseInsensitiveMultimap;
 import com.github.cafdataprocessing.worker.policy.WorkerPolicyHandler;
+import com.github.cafdataprocessing.worker.policy.WorkerResponseHolder;
 import com.google.common.collect.Multimap;
+import com.hpe.caf.util.ref.ReferencedData;
 import java.io.InputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,9 +58,13 @@ public class FieldMappingHandler extends WorkerPolicyHandler
     @Override
     protected ProcessingAction handlePolicy(Document document, Policy policy, Long collectionSequenceID)
     {
+        final com.github.cafdataprocessing.worker.policy.shared.Document policyDocument = applicationContext
+            .getBean(WorkerResponseHolder.class)
+            .getTaskData()
+            .getDocument();
         final Map<String, String> fieldNameMappings = getFieldNameMappings(policy);
         mapMetadataFields(fieldNameMappings, document.getMetadata());
-        mapMetadataReferenceFields(fieldNameMappings, document.getStreams());
+        mapMetadataReferenceFields(fieldNameMappings, policyDocument.getMetadataReferences());
         return ProcessingAction.CONTINUE_PROCESSING;
     }
 
@@ -81,14 +87,14 @@ public class FieldMappingHandler extends WorkerPolicyHandler
     }
 
     private void mapMetadataReferenceFields(final Map<String, String> fieldNameMappings,
-                                            final Multimap<String, InputStream> documentMetadata)
+                                            final Multimap<String, ReferencedData> documentMetadata)
     {
-        final Multimap<String, InputStream> fieldsToMap = getReferenceFieldsToBeMapped(fieldNameMappings, documentMetadata);
+        final Multimap<String, ReferencedData> fieldsToMap = getReferenceFieldsToBeMapped(fieldNameMappings, documentMetadata);
         if (documentMetadata != null) {
             fieldsToMap.keys().forEach(documentMetadata::removeAll);
             fieldsToMap.keySet().forEach(key -> {
                 final String newFieldName = fieldNameMappings.get(key);
-                final Collection<InputStream> currentFieldValues = fieldsToMap.get(key);
+                final Collection<ReferencedData> currentFieldValues = fieldsToMap.get(key);
                 documentMetadata.putAll(newFieldName, currentFieldValues);
             });
         }
@@ -104,10 +110,10 @@ public class FieldMappingHandler extends WorkerPolicyHandler
     return fieldsToMap;
     }
 
-    private Multimap<String, InputStream> getReferenceFieldsToBeMapped(final Map<String, String> fieldNameMappings,
-                                                                       final Multimap<String, InputStream> documentMetadata)
+    private Multimap<String, ReferencedData> getReferenceFieldsToBeMapped(final Map<String, String> fieldNameMappings,
+                                                                       final Multimap<String, ReferencedData> documentMetadata)
     {
-        final Multimap<String, InputStream> fieldsToMap = new CaseInsensitiveKeyMultimap<>();
+        final Multimap<String, ReferencedData> fieldsToMap = new CaseInsensitiveKeyMultimap<>();
         fieldNameMappings.keySet()
             .forEach(fieldNameToMap
                 -> fieldsToMap.putAll(fieldNameToMap, documentMetadata.get(fieldNameToMap)));
