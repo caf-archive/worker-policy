@@ -215,12 +215,19 @@ public class FieldMappingHandlerTest
 
         Assert.assertTrue(document.getMetadata().get("abc").isEmpty());
 
-        Assert.assertEquals(applicationContext.getBean(WorkerResponseHolder.class).getTaskData().getDocument().getMetadataReferences()
-            .get("xyz").stream().findFirst().get(), ref1);
-        Assert.assertEquals(applicationContext.getBean(WorkerResponseHolder.class).getTaskData().getDocument().getMetadataReferences()
-            .get("pqr").stream().findFirst().get(), ref2);
-        Assert.assertEquals(applicationContext.getBean(WorkerResponseHolder.class).getTaskData().getDocument().getMetadataReferences()
-            .get("wrx").stream().findFirst().get(), ref3);
+        //Test to confirm field mappings to new field names were successfull
+        final com.github.cafdataprocessing.worker.policy.shared.Document documentAfterTest = applicationContext
+            .getBean(WorkerResponseHolder.class)
+            .getTaskData()
+            .getDocument();
+        Assert.assertEquals(documentAfterTest.getMetadataReferences().get("xyz").stream().findFirst().get(), ref1);
+        Assert.assertEquals(documentAfterTest.getMetadataReferences().get("pqr").stream().findFirst().get(), ref2);
+        Assert.assertEquals(documentAfterTest.getMetadataReferences().get("wrx").stream().findFirst().get(), ref3);
+
+        //Test to ensure that old fields were removed
+        Assert.assertTrue(!documentAfterTest.getMetadataReferences().containsKey("abc"));
+        Assert.assertTrue(!documentAfterTest.getMetadataReferences().containsKey("def"));
+        Assert.assertTrue(!documentAfterTest.getMetadataReferences().containsKey("jkl"));
     }
 
     private Document setupDocument(final Multimap<String, ReferencedData> metadataReferences)
