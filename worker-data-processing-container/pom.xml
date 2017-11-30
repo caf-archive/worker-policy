@@ -24,7 +24,7 @@
     <parent>
         <groupId>com.github.cafdataprocessing</groupId>
         <artifactId>worker-policy-aggregator</artifactId>
-        <version>1.5.0-SNAPSHOT</version>
+        <version>1.5.0-84</version>
     </parent>
 
     <artifactId>worker-data-processing-container</artifactId>
