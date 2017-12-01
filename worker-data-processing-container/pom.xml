@@ -31,7 +31,6 @@
     <packaging>pom</packaging>
 
     <properties>
-        <container.classification.worker.name>${dockerCafDataProcessingOrg}worker-classification${dockerProjectVersion}</container.classification.worker.name>
         <container.worker.alias>worker-data-processing</container.worker.alias>
         <container.worker.name>${dockerCafDataProcessingOrg}worker-data-processing${dockerProjectVersion}</container.worker.name>   
 
@@ -254,9 +253,6 @@
         <profile>
             <id>use-default-fixed-ports</id>
             <properties>
-                <classification-worker-8080-serviceport>9060</classification-worker-8080-serviceport>
-                <classification-worker-8081-serviceport>9062</classification-worker-8081-serviceport>
-                <classification.container.debug.port>5007</classification.container.debug.port>
                 <data-processing.container.debug.port>5005</data-processing.container.debug.port>
                 <data-processing-worker-8080-serviceport>9002</data-processing-worker-8080-serviceport>
                 <data-processing-worker-8081-serviceport>9050</data-processing-worker-8081-serviceport>
@@ -611,7 +607,6 @@
                                     <api.admin.basedata>true</api.admin.basedata>
                                     <api.direct.repository>hibernate</api.direct.repository>
                                     <binaryhashworkerhandler.taskqueue>binary-hash-in</binaryhashworkerhandler.taskqueue>
-                                    <elasticsearchclassificationworkerhandler.taskqueue>classification-in</elasticsearchclassificationworkerhandler.taskqueue>
                                     <engine.environmentcache.location>${engine.environmentcache.location}</engine.environmentcache.location>
                                     <hibernate.connectionstring>${internal.hibernate.connectionstring}</hibernate.connectionstring>
                                     <hibernate.user>${hibernate.user}</hibernate.user>
@@ -647,60 +642,6 @@
                         </image>
 
                         <!-- Images used by integration tests -->
-
-                        <!-- Classification worker for the classification handler tests -->
-                        <image>
-                            <alias>classification-worker</alias>
-                            <name>${container.classification.worker.name}</name>
-                            <run>
-                                <env>
-                                    <CAF_RABBITMQ_HOST>rabbitmq</CAF_RABBITMQ_HOST>
-                                    <CAF_RABBITMQ_PASSWORD>${rabbit.pass}</CAF_RABBITMQ_PASSWORD>
-                                    <CAF_RABBITMQ_USERNAME>${rabbit.user}</CAF_RABBITMQ_USERNAME>
-                                    <CAF_WORKER_DATASTORE_PATH>/srv/common/webdav</CAF_WORKER_DATASTORE_PATH>
-                                    <!--<CAF_WORKER_JAVA_OPTS>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005</CAF_WORKER_JAVA_OPTS>-->
-                                    <CAF_WORKER_INPUT_QUEUE>classification-in</CAF_WORKER_INPUT_QUEUE>
-                                    <CAF_WORKER_OUTPUT_QUEUE>${worker.queue.input}</CAF_WORKER_OUTPUT_QUEUE>
-                                    <api.mode>direct</api.mode>
-                                    <api.admin.basedata>true</api.admin.basedata>
-                                    <api.direct.repository>hibernate</api.direct.repository>
-                                    <hibernate.connectionstring>${internal.hibernate.connectionstring}</hibernate.connectionstring>
-                                    <hibernate.user>${hibernate.user}</hibernate.user>
-                                    <hibernate.password>${hibernate.password}</hibernate.password>
-                                    <hibernate.databasename>${hibernate.databasename}</hibernate.databasename>
-                                </env>
-                                <ports>
-                                    <port>${classification-worker-8080-serviceport}:8080</port>
-                                    <port>${classification-worker-8081-serviceport}:8081</port>
-                                    <port>${classification.container.debug.port}:5005</port>
-                                </ports>
-                                <wait>
-                                    <http>
-                                        <!-- note this check uses external port exposed on docker VM, it may be in bridged mode, or running
-                                        in its own machine, in which case, this can be the same as the container.run.tomcat.service.port -->
-                                        <url>http://${docker.host.address}:${classification-worker-8081-serviceport}</url>
-                                        <method>GET</method>
-                                    </http>
-                                    <time>90000</time>
-                                    <shutdown>500</shutdown>
-                                </wait>
-                                <volumes>
-                                    <from>
-                                        <image>webdav</image>
-                                    </from>
-                                </volumes>
-                                <links>
-                                    <link>rabbitmq</link>
-                                    <link>corepolicydb-postgres</link>
-                                </links>
-                                <log>
-                                    <!-- enable logs from the container, they will show with policyadmin> prefix
-                                    and in the colour yellow -->
-                                    <color>yellow</color>
-                                    <enabled>true</enabled>
-                                </log>
-                            </run>
-                        </image>
 
                         <!-- Start BinaryHash Worker Image -->
                         <image>
@@ -780,26 +721,4 @@
             </plugin>
         </plugins>
     </build>
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-report-plugin</artifactId>
-                <reportSets>
-                    <reportSet>
-                        <id>failsafe-reporting-worker-classification-container</id>
-                        <configuration>
-                            <outputName>failsafe-worker-classification-container</outputName>
-                            <reportsDirectories>
-                                <file>${project.build.directory}/failsafe-reports</file>
-                            </reportsDirectories>
-                        </configuration>
-                        <reports>
-                            <report>failsafe-report-only</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-        </plugins>
-    </reporting>
 </project>
