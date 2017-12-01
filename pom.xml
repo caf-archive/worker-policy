@@ -101,7 +101,6 @@
         <module>worker-policy-type-registrant</module>
         <module>worker-policy-testing-handlers</module>
         <module>worker-policy-testing</module>
-        <module>worker-classification-container</module>
         <module>worker-data-processing-container</module>
     </modules>
 

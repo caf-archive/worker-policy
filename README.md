@@ -4,14 +4,9 @@ The worker-policy library enables set up and configuration of workflows for orch
 
 ## Workers
 
-This repository contains two workers that make use of the worker-policy library to achieve goals in data processing.
-
-[Classification Worker](./worker-classification-container)
-* A worker that uses the worker-policy library to classify documents into collections based on defined criteria.
-
 [Data Processing Worker](./worker-data-processing-container)
 * A worker that uses the worker-policy library to build up metadata for a document by sending and then collating results from other CAF workers based on the document matching defined criteria in a workflow.
 
 ## Feature Testing
 
-Test cases for a worker-policy worker implementation (e.g. Data Processing Worker) and specific tests for the Classification Worker are defined [here](testcases)
+Test cases for a worker-policy worker implementation (e.g. Data Processing Worker) are defined [here](testcases)
