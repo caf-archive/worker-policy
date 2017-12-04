@@ -101,7 +101,6 @@
         <module>worker-policy-type-registrant</module>
         <module>worker-policy-testing-handlers</module>
         <module>worker-policy-testing</module>
-        <module>worker-classification-container</module>
         <module>worker-data-processing-container</module>
     </modules>
 
@@ -121,11 +120,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>com.github.cafdataprocessing</groupId>
-                <artifactId>worker-policy-classification-handler-base</artifactId>
-                <version>${project.version}</version>
-            </dependency>
             <dependency>
                 <groupId>com.github.cafdataprocessing</groupId>
                 <artifactId>corepolicy-database</artifactId>
@@ -188,11 +182,6 @@
             </dependency>
             <dependency>
                 <groupId>com.github.cafdataprocessing</groupId>
-                <artifactId>worker-policy-handlers-converters-testing</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.cafdataprocessing</groupId>
                 <artifactId>worker-policy-handlers-shared</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -209,11 +198,6 @@
             <dependency>
                 <groupId>com.github.cafdataprocessing</groupId>
                 <artifactId>worker-policy-document-worker-handler</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.cafdataprocessing</groupId>
-                <artifactId>worker-policy-elasticsearch-classification-worker-handler</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -244,11 +228,6 @@
             <dependency>
                 <groupId>com.github.cafdataprocessing</groupId>
                 <artifactId>worker-policy-boilerplate-worker-converter</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.cafdataprocessing</groupId>
-                <artifactId>worker-policy-classification-worker-converter</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

@@ -39,14 +39,6 @@ public class PolicyTestHelper {
         return createPolicy(policyApi,"GenericQueueHandler", "Generic Queue Policy", "{\"queueName\":\"" + queueOutput + "\"}");
     }
 
-    public static Policy createElasticSearchClassificationPolicy(PolicyApi policyApi, Long classificationSeqeuenceId) throws IOException {
-        return createPolicy(policyApi, "ElasticSearchClassificationPolicyType", "Sent to Elastic Classification", "{\"classificationSequenceId\":" + classificationSeqeuenceId + "}");
-    }
-
-    public static Policy createElasticSearchClassificationWorkflowIdPolicy(PolicyApi policyApi, Long workflowId) throws IOException {
-        return createPolicy(policyApi, "ElasticSearchClassificationPolicyType", "Sent to Elastic Classification", "{\"workflowId\":" + workflowId + "}");
-    }
-
     public static Policy createPolicy(PolicyApi policyApi, String policyType, String policyNameBase, String policyDetails) throws IOException {
         Policy policy = new Policy();
         policy.name = getUniqueString(policyNameBase);
@@ -68,27 +60,6 @@ public class PolicyTestHelper {
         }
         sequenceEntry.collectionIds.add(externalCollection);
         return sequenceEntry;
-    }
-
-    public static DocumentCollection createDocumentCollection(ClassificationApi classificationApi, String nameBasis, Condition condition,
-                                                              Long policyId){
-        return createDocumentCollection(classificationApi, nameBasis, condition, policyId, null);
-    }
-
-    public static DocumentCollection createDocumentCollection(ClassificationApi classificationApi, String nameBasis, Condition condition,
-                                                              Long policyId, String description){
-        DocumentCollection documentCollection = new DocumentCollection();
-        documentCollection.name = getUniqueString(nameBasis);
-        if(description!=null){
-            documentCollection.description = description;
-        }
-        if(condition != null) {
-            documentCollection.condition = condition;
-        }
-        documentCollection.policyIds = new HashSet<>();
-        documentCollection.policyIds.add(policyId);
-        documentCollection = classificationApi.create(documentCollection);
-        return documentCollection;
     }
 
     public static ExistsCondition createExistsCondition(String field, String nameBasis){
@@ -131,21 +102,6 @@ public class PolicyTestHelper {
 
         return createPolicy(policyApi, "MetadataPolicy", "Tag the document",
                 mapper.writeValueAsString(metadataPolicy));
-    }
-
-    public static CollectionSequence createCollectionSequenceWithOneEntry(ClassificationApi classificationApi,
-                                                                          Long collectionId, String name,
-                                                                          String description)
-    {
-        CollectionSequence classificationSequence = new CollectionSequence();
-        classificationSequence.name = name;
-        classificationSequence.description = description;
-        classificationSequence.collectionSequenceEntries = new ArrayList<>();
-
-        CollectionSequenceEntry entry = PolicyTestHelper.createCollectionSequenceEntry(collectionId);
-
-        classificationSequence.collectionSequenceEntries.add(entry);
-        return classificationApi.create(classificationSequence);
     }
 
     public static SequenceWorkflow createWorkflowWithOneEntry(WorkflowApi workflowApi, Long sequenceId,

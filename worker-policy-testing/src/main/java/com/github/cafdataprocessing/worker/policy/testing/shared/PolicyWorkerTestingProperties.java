@@ -78,14 +78,6 @@ public class PolicyWorkerTestingProperties {
         return environment.getProperty("worker.datastore.partialreference");
     }
 
-    public String getExternalClassificationQueue(){
-        return environment.getProperty("rabbit.classificationqueue");
-    }
-
-    public String getElasticClassificationQueue(){
-        return environment.getProperty("rabbit.elasticclassificationqueue");
-    }
-    
     public String getJobTrackingPipe(){
         // if we are really using job-tracking or wish to see the debug output of it tracking an item or marking it complete use a
         // real jobtracking worker.

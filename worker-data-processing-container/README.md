@@ -55,11 +55,11 @@ The following handlers and converters are included in the image.
 * Document Worker
   * [Handler](../handlers-converters/handlers/document-worker)
   * [Converter](../handlers-converters/converters/document-worker)
-  
-* Elasticsearch Classification Worker
-  * [Handler](../handlers-converters/handlers/elasticsearch-classification)
-  * [Converter](../handlers-converters/converters/classification)
-  
+
+* Composite Document Worker
+  * [Handler](../handlers-converters/handlers/composite-document)
+  * [Converter](../handlers-converters/converters/composite-document)
+
 * Field Mapping Handler
   * [Handler](../handlers-converters/handlers/field-mapping)
     

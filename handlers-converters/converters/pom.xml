@@ -30,7 +30,6 @@
     <modules>
         <module>binary-hash</module>
         <module>boilerplate</module>
-        <module>classification</module>
         <module>document-worker</module>
         <module>composite-document</module>
         <module>markup</module>
