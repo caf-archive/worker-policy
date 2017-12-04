@@ -71,8 +71,6 @@ public abstract class BaseTestsHelper extends IntegrationTestBase
     protected final CorePolicyObjectMapper mapper = new CorePolicyObjectMapper();
     protected static String INPUT_QUEUENAME = "Input";
     protected static String RESULT_QUEUENAME = "Results";
-    protected static String CLASSIFICATION_QUEUENAME = "classificationqueue";
-    protected static String ELASTIC_CLASSIFICATION_QUEUENAME = "elasticclassificationqueue";
 
     //number of seconds allowed to wait for result to be delivered to results queue consumer
     protected static int RESULT_TIMEOUTSECONDS;
