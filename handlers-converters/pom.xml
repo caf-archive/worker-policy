@@ -35,6 +35,5 @@
         <module>util-policy-converters</module>
         <module>converter-qa</module>
         <module>converters</module>
-        <module>testing</module>
     </modules>
 </project>

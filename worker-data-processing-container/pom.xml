@@ -105,10 +105,6 @@
         </dependency>
         <dependency>
             <groupId>com.github.cafdataprocessing</groupId>
-            <artifactId>worker-policy-elasticsearch-classification-worker-handler</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.cafdataprocessing</groupId>
             <artifactId>worker-policy-document-worker-handler</artifactId>
         </dependency>
         <dependency>
@@ -134,10 +130,6 @@
         <dependency>
             <groupId>com.github.cafdataprocessing</groupId>
             <artifactId>worker-policy-boilerplate-worker-converter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.cafdataprocessing</groupId>
-            <artifactId>worker-policy-classification-worker-converter</artifactId>
         </dependency>
         <dependency>
             <groupId>com.github.cafdataprocessing</groupId>

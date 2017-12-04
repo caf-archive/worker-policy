@@ -122,11 +122,6 @@
         <dependencies>
             <dependency>
                 <groupId>com.github.cafdataprocessing</groupId>
-                <artifactId>worker-policy-classification-handler-base</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.cafdataprocessing</groupId>
                 <artifactId>corepolicy-database</artifactId>
                 <version>${caf.corepolicy.version}</version>
             </dependency>
@@ -212,11 +207,6 @@
             </dependency>
             <dependency>
                 <groupId>com.github.cafdataprocessing</groupId>
-                <artifactId>worker-policy-elasticsearch-classification-worker-handler</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.cafdataprocessing</groupId>
                 <artifactId>worker-policy-field-mapping-handler</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -243,11 +233,6 @@
             <dependency>
                 <groupId>com.github.cafdataprocessing</groupId>
                 <artifactId>worker-policy-boilerplate-worker-converter</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.cafdataprocessing</groupId>
-                <artifactId>worker-policy-classification-worker-converter</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
