@@ -114,8 +114,6 @@ public abstract class BaseTestsHelper extends IntegrationTestBase
         if(rabbitConnection==null) {
             INPUT_QUEUENAME = properties.getInputQueueName();
             RESULT_QUEUENAME = properties.getResultQueueName();
-            CLASSIFICATION_QUEUENAME = properties.getExternalClassificationQueue();
-            ELASTIC_CLASSIFICATION_QUEUENAME = properties.getElasticClassificationQueue();
             RESULT_TIMEOUTSECONDS = properties.getResultTimeoutSeconds();
             RABBIT_HOST = properties.getRabbitHost();
             RABBIT_USER = properties.getRabbitUser();
