@@ -31,10 +31,8 @@
     <modules>
         <module>binary-hash</module>
         <module>boilerplate</module>
-        <module>classification-handler-base</module>
         <module>document-worker</module>
         <module>composite-document</module>
-        <module>elasticsearch-classification</module>
         <module>field-mapping</module>
         <module>generic-queue</module>
         <module>markup</module>
