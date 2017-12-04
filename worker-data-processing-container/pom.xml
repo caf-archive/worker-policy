@@ -147,11 +147,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.cafdataprocessing</groupId>
-            <artifactId>worker-policy-handlers-converters-testing</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>com.github.krallin</groupId>
             <artifactId>tini</artifactId>
             <scope>runtime</scope>
@@ -315,7 +310,6 @@
                     <!--<debugForkedProcess>true</debugForkedProcess>-->
                     <dependenciesToScan>
                         <dependency>com.github.cafdataprocessing:worker-policy-testing</dependency>
-                        <dependency>com.github.cafdataprocessing:worker-policy-handlers-converters-testing</dependency>
                     </dependenciesToScan>
                     <environmentVariables>
                         <CAF_INTEGRATIONTESTS_FS_PATH>${caf.integrationtests.fs.path}</CAF_INTEGRATIONTESTS_FS_PATH>

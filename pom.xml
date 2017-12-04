@@ -182,11 +182,6 @@
             </dependency>
             <dependency>
                 <groupId>com.github.cafdataprocessing</groupId>
-                <artifactId>worker-policy-handlers-converters-testing</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.cafdataprocessing</groupId>
                 <artifactId>worker-policy-handlers-shared</artifactId>
                 <version>${project.version}</version>
             </dependency>
