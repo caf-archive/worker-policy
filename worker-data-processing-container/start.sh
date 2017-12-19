@@ -172,5 +172,5 @@ fi
 
 #Launch the policyworker
 echo "CAF_WORKER_JAVA_OPTS " $CAF_WORKER_JAVA_OPTS
-exec java $CAF_WORKER_JAVA_OPTS -server -cp "/opt/PolicyWorker/*:/opt/PolicyWorker/lib/*:/opt/PolicyWorker/Handlers/*:/mnt/mesos/sandbox/*:/mnt/mesos/sandbox/handlers/*:/mnt/mesos/sandbox/converters/*:" com.hpe.caf.worker.core.WorkerApplication server ${logFile} |& sed -ue 's/^/Policy Worker: /' &
+exec java $CAF_WORKER_JAVA_OPTS -server -cp "/opt/PolicyWorker/*:/opt/PolicyWorker/lib/*:/opt/PolicyWorker/Handlers/*:/mnt/mesos/sandbox/*:/mnt/mesos/sandbox/handlers/*:/mnt/mesos/sandbox/converters/*:" com.hpe.caf.worker.core.WorkerApplication server ${logFile} |& sed -ue 's/^/Policy Worker: /'
 echo "ending setup"
