@@ -105,7 +105,7 @@
     </modules>
 
     <properties>
-        <caf.base-container.policy-elasticsearch>cafinternal/prereleases:policy-elasticsearch-container-2.0.0-SNAPSHOT</caf.base-container.policy-elasticsearch>
+        <caf.base-container.policy-elasticsearch>cafinternal/prereleases:policy-elasticsearch-container-2.0.0-start_es-SNAPSHOT</caf.base-container.policy-elasticsearch>
         <caf.document.worker.version>3.1.1-71</caf.document.worker.version>
         <caf.binaryhash.version>2.1.0-28</caf.binaryhash.version>
         <caf.worker.binaryhash.container.name>cafdataprocessing/worker-binaryhash:2.1.0</caf.worker.binaryhash.container.name>

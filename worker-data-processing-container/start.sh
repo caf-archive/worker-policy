@@ -77,7 +77,7 @@ should_start_elasticsearch() {
 start_elasticsearch() {
     /opt/elasticsearchConfig/configureElasticsearch.sh
     echo "Attempting to start Elasticsearch ..."
-    /opt/elasticsearch/bin/elasticsearch -Des.insecure.allow.root=true -d
+    /opt/elasticsearch/scripts/start.sh |& sed -ue 's/^/Elasticsearch: /' &
     if [ -n "$POLICY_ELASTICSEARCH_VERIFY_ATTEMPTS" ];
 	then
 	  remainingChecks=$POLICY_ELASTICSEARCH_VERIFY_ATTEMPTS
