@@ -77,7 +77,7 @@ should_start_elasticsearch() {
 start_elasticsearch() {
     /opt/elasticsearchConfig/configureElasticsearch.sh
     echo "Attempting to start Elasticsearch ..."
-    /etc/init.d/elasticsearch start
+    /opt/elasticsearch/scripts/start.sh |& sed -ue 's/^/Elasticsearch: /' &
     if [ -n "$POLICY_ELASTICSEARCH_VERIFY_ATTEMPTS" ];
 	then
 	  remainingChecks=$POLICY_ELASTICSEARCH_VERIFY_ATTEMPTS
@@ -86,7 +86,7 @@ start_elasticsearch() {
 	fi
     while [ "$remainingChecks" -ne "0" ]
     do
-        if service elasticsearch status | grep -q "elasticsearch is running" && curl --silent http://localhost:9200/_cluster/health | grep -q 'cluster_name';
+        if curl --silent http://localhost:9200/_cluster/health | grep -q 'cluster_name';
         then
             echo "Elasticsearch started."
             remainingChecks=0
@@ -144,15 +144,6 @@ function set_logging_file_location(){
 }
 
 ####################################################
-# Installs a java certificate optionally passed into container.
-####################################################
-function install_certificate(){
-    #This will import the CA Cert from $MESOS_SANDBOX/$SSL_CA_CRT to the default Java keystore location depending on your distribution.
-    /opt/container-cert-script/install-ca-cert-java.sh
-}
-
-
-####################################################
 ####################################################
 # Start of actual execution.
 ####################################################
@@ -169,8 +160,6 @@ fi;
 
 set_logging_file_location
 
-install_certificate
-
 # If the CAF_APPNAME and CAF_CONFIG_PATH environment variables are not set, then use the
 # JavaScript-encoded config files that are built into the container
 if [ -z "$CAF_APPNAME" ] && [ -z "$CAF_CONFIG_PATH" ];
@@ -183,5 +172,5 @@ fi
 
 #Launch the policyworker
 echo "CAF_WORKER_JAVA_OPTS " $CAF_WORKER_JAVA_OPTS
-exec java $CAF_WORKER_JAVA_OPTS -server -cp "/opt/PolicyWorker/*:/opt/PolicyWorker/lib/*:/opt/PolicyWorker/Handlers/*:/mnt/mesos/sandbox/*:/mnt/mesos/sandbox/handlers/*:/mnt/mesos/sandbox/converters/*:" com.hpe.caf.worker.core.WorkerApplication server ${logFile}
+exec java $CAF_WORKER_JAVA_OPTS -server -cp "/opt/PolicyWorker/*:/opt/PolicyWorker/lib/*:/opt/PolicyWorker/Handlers/*:/mnt/mesos/sandbox/*:/mnt/mesos/sandbox/handlers/*:/mnt/mesos/sandbox/converters/*:" com.hpe.caf.worker.core.WorkerApplication server ${logFile} |& sed -ue 's/^/Policy Worker: /'
 echo "ending setup"

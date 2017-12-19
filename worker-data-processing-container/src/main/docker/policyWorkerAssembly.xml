@@ -26,29 +26,9 @@
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <useTransitiveFiltering>true</useTransitiveFiltering>
             <excludes>
-                <exclude>com.github.cafapi:container-cert-script</exclude>
                 <exclude>com.github.cafdataprocessing:corepolicy-database</exclude>
-                <exclude>com.github.krallin:tini</exclude>
             </excludes>
             <outputDirectory>PolicyWorker</outputDirectory>
-        </dependencySet>
-
-        <!-- Explicitly specifying tini dependency so we can set execute permission on the file -->
-        <dependencySet>
-            <useProjectArtifact>false</useProjectArtifact>
-            <fileMode>0755</fileMode>
-            <includes>
-                <include>com.github.krallin:tini</include>
-            </includes>
-        </dependencySet>
-        <!-- unpack the container-cert-script tar so the script files are available to run -->
-        <dependencySet>
-            <useProjectArtifact>false</useProjectArtifact>
-            <useTransitiveFiltering>true</useTransitiveFiltering>
-            <unpack>true</unpack>
-            <includes>
-                <include>com.github.cafapi:container-cert-script</include>
-            </includes>
         </dependencySet>
     </dependencySets>
     <files>
