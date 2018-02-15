@@ -692,7 +692,12 @@ public class ExecuteTaskData {
         }
 
         workerPolicyHandler.setApplicationContext(corePolicyApplicationContext);
-        ((ClassifyDocumentApiDirectImpl) classifyDocumentApi).registerHandler(workerPolicyHandler);
+        try {
+            ((ClassifyDocumentApiDirectImpl) classifyDocumentApi).registerHandler(workerPolicyHandler);
+        } catch (final NullPointerException ex) {
+            logger.error("NullPointerException thrown while trying to register handler " + uniqueName + " for context: "
+                + corePolicyApplicationContext, ex);
+        }
 
         //Register policy
         PolicyType policyTypeToRegister = workerPolicyHandler.getPolicyType();
