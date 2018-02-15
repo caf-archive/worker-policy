@@ -51,6 +51,7 @@ import java.util.stream.Collectors;
  * Main logic class for handling executing against a task data object.
  */
 public class ExecuteTaskData {
+    private static final Object syncKey = new Object();
     private final CorePolicyApplicationContext corePolicyApplicationContext;
     private final DataStoreSource dataStoreSource;
     private final LoadingCache<Long, SequenceWorkflow> workflowCache;
@@ -63,6 +64,7 @@ public class ExecuteTaskData {
     private static List<String> registeredHandlers = new ArrayList<>();
     private static List<String> registeredUsers = new ArrayList<>();
     private ClassifyDocumentResultConverter classifyDocumentResultConverter;
+    
 
     public ExecuteTaskData(CorePolicyApplicationContext corePolicyApplicationContext, PolicyWorker worker,
                            DataStoreSource dataStoreSource,
@@ -670,15 +672,17 @@ public class ExecuteTaskData {
      */
     private void registerHandlers(String projectId) {
         if (classifyDocumentApi instanceof ClassifyDocumentApiDirectImpl) {
-            UserContext userContext = corePolicyApplicationContext.getBean(UserContext.class);
+            final UserContext userContext = corePolicyApplicationContext.getBean(UserContext.class);
             userContext.setProjectId(projectId);
-            if (!registeredUsers.contains(projectId)) {
-                ServiceLoader<WorkerPolicyHandler> loader = ServiceLoader.load(WorkerPolicyHandler.class);
+            synchronized (syncKey) {
+                if (!registeredUsers.contains(projectId)) {
+                    final ServiceLoader<WorkerPolicyHandler> loader = ServiceLoader.load(WorkerPolicyHandler.class);
 
-                for (WorkerPolicyHandler handler : loader) {
-                    setUpWorkerHandler(handler, projectId);
+                    for (final WorkerPolicyHandler handler : loader) {
+                        setUpWorkerHandler(handler, projectId);
+                    }
+                    registeredUsers.add(projectId);
                 }
-                registeredUsers.add(projectId);
             }
         }
     }
@@ -697,6 +701,7 @@ public class ExecuteTaskData {
         } catch (final NullPointerException ex) {
             logger.error("NullPointerException thrown while trying to register handler " + uniqueName + " for context: "
                 + corePolicyApplicationContext, ex);
+            throw ex;
         }
 
         //Register policy
@@ -704,12 +709,17 @@ public class ExecuteTaskData {
         PolicyType registeredPolicyType;
         try {
             registeredPolicyType = policyApi.retrievePolicyTypeByName(policyTypeToRegister.shortName);
+            if (registeredPolicyType.id == null) {
+                throw new RuntimeException("Policy Type ID for name " + policyTypeToRegister.shortName + " not found.");
+            }
         } catch (Exception e) {
             logger.trace("PolicyType for name " + policyTypeToRegister.shortName + " not found.", e);
             // workers for this type aren't found in the system this is fatal, and shouldn't happen.
             throw new RuntimeException("PolicyType for name " + policyTypeToRegister.shortName + " not found.", e);
         }
-
+        if(registeredPolicyType.id == null ){
+            
+        }
         workerPolicyHandler.setPolicyTypeId(registeredPolicyType.id);
 
         logger.info("Registered WorkerPolicyHandler - " + uniqueName);
