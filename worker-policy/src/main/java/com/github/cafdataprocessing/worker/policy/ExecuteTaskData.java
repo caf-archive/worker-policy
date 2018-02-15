@@ -717,9 +717,6 @@ public class ExecuteTaskData {
             // workers for this type aren't found in the system this is fatal, and shouldn't happen.
             throw new RuntimeException("PolicyType for name " + policyTypeToRegister.shortName + " not found.", e);
         }
-        if(registeredPolicyType.id == null ){
-            
-        }
         workerPolicyHandler.setPolicyTypeId(registeredPolicyType.id);
 
         logger.info("Registered WorkerPolicyHandler - " + uniqueName);
