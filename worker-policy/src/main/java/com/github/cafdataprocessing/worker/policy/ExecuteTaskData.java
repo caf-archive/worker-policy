@@ -674,16 +674,14 @@ public class ExecuteTaskData {
         if (classifyDocumentApi instanceof ClassifyDocumentApiDirectImpl) {
             final UserContext userContext = corePolicyApplicationContext.getBean(UserContext.class);
             userContext.setProjectId(projectId);
-            if (!registeredUsers.contains(projectId)) {
-                synchronized (REGISTERED_USERS_LOCK) {
-                    if (!registeredUsers.contains(projectId)) {
-                        final ServiceLoader<WorkerPolicyHandler> loader = ServiceLoader.load(WorkerPolicyHandler.class);
+            synchronized (REGISTERED_USERS_LOCK) {
+                if (!registeredUsers.contains(projectId)) {
+                    final ServiceLoader<WorkerPolicyHandler> loader = ServiceLoader.load(WorkerPolicyHandler.class);
 
-                        for (final WorkerPolicyHandler handler : loader) {
-                            setUpWorkerHandler(handler, projectId);
-                        }
-                        registeredUsers.add(projectId);
+                    for (final WorkerPolicyHandler handler : loader) {
+                        setUpWorkerHandler(handler, projectId);
                     }
+                    registeredUsers.add(projectId);
                 }
             }
         }
