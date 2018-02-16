@@ -61,7 +61,7 @@ public class ExecuteTaskData {
     private final PolicyWorker policyWorker;
     private final DocumentConverter documentConverter;
     private static final Object REGISTERED_USERS_LOCK = new Object();
-    private static volatile List<String> registeredHandlers = new ArrayList<>();
+    private static List<String> registeredHandlers = new ArrayList<>();
     private static List<String> registeredUsers = new ArrayList<>();
     private ClassifyDocumentResultConverter classifyDocumentResultConverter;
     
