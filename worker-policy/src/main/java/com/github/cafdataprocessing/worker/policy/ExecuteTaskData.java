@@ -61,7 +61,7 @@ public class ExecuteTaskData {
     private final PolicyWorker policyWorker;
     private final DocumentConverter documentConverter;
     private static final Object REGISTERED_USERS_LOCK = new Object();
-    private static List<String> registeredHandlers = new ArrayList<>();
+    private static volatile List<String> registeredHandlers = new ArrayList<>();
     private static List<String> registeredUsers = new ArrayList<>();
     private ClassifyDocumentResultConverter classifyDocumentResultConverter;
     
@@ -674,14 +674,16 @@ public class ExecuteTaskData {
         if (classifyDocumentApi instanceof ClassifyDocumentApiDirectImpl) {
             final UserContext userContext = corePolicyApplicationContext.getBean(UserContext.class);
             userContext.setProjectId(projectId);
-            synchronized (REGISTERED_USERS_LOCK) {
-                if (!registeredUsers.contains(projectId)) {
-                    final ServiceLoader<WorkerPolicyHandler> loader = ServiceLoader.load(WorkerPolicyHandler.class);
+            if (!registeredUsers.contains(projectId)) {
+                synchronized (REGISTERED_USERS_LOCK) {
+                    if (!registeredUsers.contains(projectId)) {
+                        final ServiceLoader<WorkerPolicyHandler> loader = ServiceLoader.load(WorkerPolicyHandler.class);
 
-                    for (final WorkerPolicyHandler handler : loader) {
-                        setUpWorkerHandler(handler, projectId);
+                        for (final WorkerPolicyHandler handler : loader) {
+                            setUpWorkerHandler(handler, projectId);
+                        }
+                        registeredUsers.add(projectId);
                     }
-                    registeredUsers.add(projectId);
                 }
             }
         }
